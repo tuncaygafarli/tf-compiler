@@ -13,6 +13,7 @@ enum class TokenType {
 	Left_Parenthese,
 	Right_Parenthese,
 	Identifier,
+	Equals,
 	End
 };
 

@@ -10,14 +10,17 @@ double VariableNode::evaluate(SymbolTable& env) const {
 		return env[name];
 	}
 
-	throw std::runtime_error("Undefined variable" + name);
+	throw std::runtime_error("Undefined variable " + name);
 }
 
-AssignmentNode::AssignmentNode(std::string& id, std::unique_ptr<ASTNode> rhs) : identifier(id), rightHandSide(std::move(rhs)) {}
+AssignmentNode::AssignmentNode(std::string id, std::unique_ptr<ASTNode> rhs_ptr)
+    : identifier(std::move(id)), rhs(std::move(rhs_ptr)) {
+}
+
 double AssignmentNode::evaluate(SymbolTable& env) const {
-	double value = rightHandSide->evaluate(env);
-	env[identifier] = value;
-	return value;
+    double val = rhs->evaluate(env);
+    env[identifier] = val;
+    return val;
 }
 
 BinOpNode::BinOpNode(char op, std::unique_ptr<ASTNode> left, std::unique_ptr<ASTNode> right)

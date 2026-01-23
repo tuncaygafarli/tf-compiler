@@ -27,10 +27,10 @@ public:
 };
 
 class AssignmentNode : public ASTNode {
-	std::string& identifier;
-	std::unique_ptr<ASTNode> rightHandSide;
+	std::string identifier;
+	std::unique_ptr<ASTNode> rhs;	
 public:
-	AssignmentNode(std::string& id, std::unique_ptr<ASTNode> rhs);
+	AssignmentNode(std::string id, std::unique_ptr<ASTNode> rhs_ptr);
 	double evaluate(SymbolTable& env) const override;
 };
 

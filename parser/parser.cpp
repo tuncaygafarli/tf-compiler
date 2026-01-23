@@ -14,6 +14,13 @@ Token Parser::peekToken() {
 	return { TokenType::End, 0 };
 }
 
+Token Parser::lookAhead(int distance) {
+	if (pos + distance < tokens.size()) {
+		return tokens[pos + distance];
+	}
+	return { TokenType::End, 0, "" };
+}
+
 std::unique_ptr<ASTNode> Parser::parseFactor() {
 	Token current = peekToken();
 
@@ -61,6 +68,20 @@ std::unique_ptr<ASTNode> Parser::parseExpression() {
 			left = std::make_unique<BinOpNode>(opChar, std::move(left), std::move(right));
 	}
 	return left;
+}
+
+std::unique_ptr<ASTNode> Parser::parseStatement() {
+	Token current = peekToken();
+
+	if (current.type == TokenType::Identifier && lookAhead(1).type == TokenType::Equals) {
+		std::string name = getNextToken().name;
+		consume(TokenType::Equals);
+
+		auto rhs = parseExpression();
+		return std::make_unique<AssignmentNode>(name, std::move(rhs));
+	}
+
+	return parseExpression();
 }
 
 void Parser::consume(TokenType expected) {

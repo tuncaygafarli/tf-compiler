@@ -18,8 +18,10 @@ public:
 
 	Token getNextToken();
 	Token peekToken();
+	Token lookAhead(int distance);
 	std::unique_ptr<ASTNode> parseFactor();
 	std::unique_ptr<ASTNode> parseTerm();
 	std::unique_ptr<ASTNode> parseExpression();
+	std::unique_ptr<ASTNode> parseStatement();
 	void consume(TokenType expected);
 };

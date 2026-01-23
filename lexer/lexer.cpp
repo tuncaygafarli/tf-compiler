@@ -18,14 +18,24 @@ std::vector<Token> tokenize(const std::string& input) {
 			tokens.emplace_back(TokenType::Number, std::stod(buffer));
 		}
 
+		else if (std::isalpha(character)) {
+			std::string buffer;
+			while (i < input.length() && std::isalnum(input[i])) {
+				buffer += input[i++];
+			}
+			--i;
+			tokens.push_back({ TokenType::Identifier, 0, buffer });
+		}
+
 		else {
 			switch (character) {
-			case '+': tokens.emplace_back(TokenType::Add, 0); break;
-			case '-': tokens.emplace_back(TokenType::Substract, 0); break;
-			case '*': tokens.emplace_back(TokenType::Multiply, 0); break;
-			case '/': tokens.emplace_back(TokenType::Division, 0); break;
-			case '(': tokens.emplace_back(TokenType::Left_Parenthese, 0); break;
-			case ')': tokens.emplace_back(TokenType::Right_Parenthese, 0); break;
+			case '+': tokens.emplace_back(TokenType::Add, 0, ""); break;
+			case '-': tokens.emplace_back(TokenType::Substract, 0, ""); break;
+			case '*': tokens.emplace_back(TokenType::Multiply, 0, ""); break;
+			case '/': tokens.emplace_back(TokenType::Division, 0, ""); break;
+			case '(': tokens.emplace_back(TokenType::Left_Parenthese, 0, ""); break;
+			case ')': tokens.emplace_back(TokenType::Right_Parenthese, 0, ""); break;
+			case '=': tokens.emplace_back(TokenType::Equals, 0, ""); break;
 			default:
 				std::cerr << "Unexpected character: " << character << std::endl;
 				break;
