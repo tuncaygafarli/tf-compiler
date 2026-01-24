@@ -12,7 +12,7 @@ struct Value {
     std::string text = "";
     std::vector<Value> list;
 
-    Value(std::string s) : isString(true), text(s), number(0.0) {}
+    Value(std::string s) : isString(true), text(std::move(s)), number(0.0) {}
     Value(double d) : isString(false), number(d), text("") {}
     Value(std::vector<Value> l) : isArray(true), list(std::move(l)) {}
     Value() {}
@@ -36,7 +36,7 @@ struct Value {
                 list[i].print(os);
                 if (i < list.size() - 1) os << ", ";
             }
-            os << "}";
+            os << "}" << "\n";
         } else if (isString) {
             os << "\"" << text << "\"";
         } else {

@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
 				for (const auto& [groupName, table] : forest) {
 					for (const auto& [varName, val] : table) {
 						hasAnyVariables = true;
-						
+
 						if (groupName == "default") {
 							std::cout << varName << " = ";
 						} else {
@@ -97,6 +97,7 @@ int main(int argc, char* argv[]) {
 				if (root) {
 					Value result = root->evaluate(forest);
 					result.print(std::cout);
+					std::cout << "\n";
 				}
 			}
 			catch (const std::exception& e) {
