@@ -27,7 +27,26 @@ Value VariableNode::evaluate(SymbolContainer& forest, std::string currentGroup) 
 Value AssignmentNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     Value val = rhs->evaluate(env, currentGroup);
     
-    env[currentGroup][identifier] = val; 
+    std::string targetGroup;
+
+    if (scopePath.empty()) {
+        targetGroup = currentGroup;
+    } else {
+        targetGroup = scopePath[0];
+        for (size_t i = 1; i < scopePath.size(); ++i) {
+            targetGroup += "." + scopePath[i];
+        }
+
+        if (currentGroup == "global" && env.find(targetGroup) == env.end()) {
+            std::string globalPath = "global." + targetGroup;
+            if (env.find(globalPath) != env.end()) {
+                targetGroup = globalPath;
+            }
+        }
+    }
+
+    // 4. Save the value into the correct "tree" in the forest
+    env[targetGroup][identifier] = val; 
     return val;
 }
 

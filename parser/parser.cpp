@@ -46,6 +46,18 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 			scope.push_back(std::move(tok.name));
 		}
 
+		if (peekToken().type == TokenType::Equals) {
+			consume(TokenType::Equals);
+			
+			std::string varName = scope.back();
+			scope.pop_back();
+
+			auto rhs = parseExpression();
+			consume(TokenType::Semicolon);
+
+			return std::make_unique<AssignmentNode>(varName, std::move(rhs), scope);
+    	}
+
 		std::string varName = scope.back();
 		scope.pop_back();
 
@@ -134,6 +146,34 @@ std::unique_ptr<ASTNode> Parser::parseExpression() {
 std::unique_ptr<ASTNode> Parser::parseStatement() {
 	Token current = peekToken();
 
+	// scope assignment
+	if(current.type == TokenType::Identifier){
+		int checkPos = 1;
+
+		while(lookAhead(checkPos).type == TokenType::Dot){
+			checkPos += 2;
+		}
+
+		if(lookAhead(checkPos).type == TokenType::Equals){
+			std::vector<std::string> path;
+            path.push_back(consume(TokenType::Identifier).name);
+
+            while (peekToken().type == TokenType::Dot) {
+                consume(TokenType::Dot);
+                path.push_back(consume(TokenType::Identifier).name);
+            }
+
+            std::string varName = path.back();
+            path.pop_back();
+
+            consume(TokenType::Equals);
+            auto rhs = parseExpression();
+            consume(TokenType::Semicolon);
+
+            return std::make_unique<AssignmentNode>(varName, std::move(rhs), path);
+		}
+	}
+
 	// log function
 	if (peekToken().type == TokenType::Print) {
 		getNextToken();
@@ -165,17 +205,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 
 		return std::make_unique<GroupNode>(treeName, std::move(statements));
 	}
-
-	// assignment
-	if (current.type == TokenType::Identifier && lookAhead(1).type == TokenType::Equals) {
-		std::string name = getNextToken().name;
-		consume(TokenType::Equals);
-
-		auto rhs = parseExpression();
-		consume(TokenType::Semicolon);
-		return std::make_unique<AssignmentNode>(name, std::move(rhs));
-	}
-
+	
 	return parseExpression();
 }
 

@@ -78,9 +78,10 @@ public:
 class AssignmentNode : public ASTNode {
     std::string identifier;
     std::unique_ptr<ASTNode> rhs;
+    std::vector<std::string> scopePath;
 public:
-    AssignmentNode(std::string id, std::unique_ptr<ASTNode> rhs_ptr)
-        : identifier(id), rhs(std::move(rhs_ptr)) {
+    AssignmentNode(std::string id, std::unique_ptr<ASTNode> rhs_ptr, std::vector<std::string> path = {})
+        : identifier(std::move(id)), rhs(std::move(rhs_ptr)), scopePath(std::move(path)) {
     }
     Value evaluate(SymbolContainer& forest, std::string currentGroup = "global") const override;
 };
