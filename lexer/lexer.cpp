@@ -72,3 +72,27 @@ std::vector<Token> tokenize(const std::string& input) {
 	tokens.emplace_back(TokenType::End, 0);
 	return tokens;
 }
+
+std::string tokenTypeToString(TokenType type) {
+    switch (type) {
+        case TokenType::Number:           return "Number";
+        case TokenType::Multiply:         return "'*'";
+        case TokenType::Add:              return "'+'";
+        case TokenType::Substract:        return "'-'";
+        case TokenType::Division:         return "'/'";
+        case TokenType::Left_Parenthese:  return "'('";
+        case TokenType::Right_Parenthese: return "')'";
+        case TokenType::Identifier:       return "Identifier";
+        case TokenType::Equals:           return "'='";
+        case TokenType::Print:            return "'log'";
+        case TokenType::String:           return "String";
+        case TokenType::Group:            return "Group";
+        case TokenType::Left_CB:          return "'{'";
+        case TokenType::Right_CB:         return "'}'";
+        case TokenType::Left_Bracket:     return "'['";
+        case TokenType::Right_Bracket:    return "']'";
+        case TokenType::Comma:            return "','";
+        case TokenType::End:              return "End of File";
+        default:                          return "Unknown Token";
+    }
+}

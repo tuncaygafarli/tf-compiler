@@ -106,6 +106,7 @@ std::unique_ptr<ASTNode> Parser::parseExpression() {
 std::unique_ptr<ASTNode> Parser::parseStatement() {
 	Token current = peekToken();
 
+	// log function
 	if (peekToken().type == TokenType::Print) {
 		getNextToken();
 		consume(TokenType::Left_Parenthese);
@@ -116,6 +117,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 		return std::make_unique<PrintNode>(std::move(expr));
 	}
 
+	// parsing group nodes
 	if (peekToken().type == TokenType::Group) {
 		consume(TokenType::Group);
 
@@ -134,6 +136,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 		return std::make_unique<GroupNode>(treeName, std::move(statements));
 	}
 
+	// assignment
 	if (current.type == TokenType::Identifier && lookAhead(1).type == TokenType::Equals) {
 		std::string name = getNextToken().name;
 		consume(TokenType::Equals);
@@ -151,6 +154,6 @@ Token Parser::consume(TokenType expected) {
 		return tokens[pos++];
 	}
 	throw std::runtime_error("Error: Unexpected token type! Expected " +
-		std::to_string((int)expected) + " but got " +
-		std::to_string((int)peekToken().type));
+		tokenTypeToString(expected) + " but got " +
+		tokenTypeToString(peekToken().type));
 }

@@ -38,3 +38,4 @@ struct Token {
 };
 
 std::vector<Token> tokenize(const std::string& input);
+std::string tokenTypeToString(TokenType type);
