@@ -6,38 +6,29 @@
 #include <vector>
 
 struct Value {
-    bool isString = false;
-    bool isArray = false;
-    double number = 0.0;
-    std::string text = "";
+    enum Type { NUMBER, STRING, ARRAY, TABLE, NONE };
+    Type type = NONE;
+
+    double number = 0;
+    std::string text;
     std::vector<Value> list;
+    std::unordered_map<std::string, Value> table;
 
-    Value(std::string s) : isString(true), text(std::move(s)), number(0.0) {}
-    Value(double d) : isString(false), number(d), text("") {}
-    Value(std::vector<Value> l) : isArray(true), list(std::move(l)) {}
-    Value() {}
-
-    Value& operator=(double d) {
-        isString = false;
-        number = d;
-        return *this;
-    }
-
-    Value& operator=(const std::string& s) {
-        isString = true;
-        text = s;
-        return *this;
-    }
-
+    Value() : type(NONE) {}
+    Value(double n) : type(NUMBER), number(n) {}
+    Value(std::string s) : type(STRING), text(std::move(s)) {}
+    Value(std::vector<Value> l) : type(ARRAY), list(std::move(l)) {}
+    Value(std::unordered_map<std::string, Value> t) : type(TABLE), table(std::move(t)) {}
+    
     void print(std::ostream& os) const {
-        if (isArray) {
+        if (type == Type::ARRAY) {
             os << "{";
             for (size_t i = 0; i < list.size(); ++i) {
                 list[i].print(os);
                 if (i < list.size() - 1) os << ", ";
             }
-            os << "}" << "\n";
-        } else if (isString) {
+            os << "}";
+        } else if (type == Type::STRING) {
             os << "\"" << text << "\"";
         } else {
             os << number;
