@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 
 		std::stringstream buffer;
 		buffer << file.rdbuf();
-		std::string content = buffer.str();
+		const std::string& content = buffer.str();
 
 		auto tokens = tokenize(content);
 

@@ -1,9 +1,9 @@
-x = 50
 y = 100
 z = "Hello world"
 
-group Human { 
-	x = 10
+group Farhad {
+	z = "Hello world"
+	age = z
 }
 
-log(Human[x])
+log(Farhad[age])
