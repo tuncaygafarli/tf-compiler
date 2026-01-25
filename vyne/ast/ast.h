@@ -30,8 +30,18 @@ struct Value {
         if (type == STRING) return text == other.text;
         if (type == BOOLEAN) return boolean == other.boolean;
         if (type == NONE) return true;
-        
+
         return false; 
+    }
+
+    bool operator<(const Value& other) const {
+        if (type != other.type) return type < other.type;
+
+        if (type == NUMBER) return number < other.number;
+
+        if (type == STRING) return text < other.text;
+
+        return false;
     }
 
     void print(std::ostream& os) const {

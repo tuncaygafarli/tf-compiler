@@ -174,6 +174,19 @@ Value MethodCallNode::evaluate(SymbolContainer& env, std::string currentGroup) c
 
             return Value(true);
         }
+
+        if (methodName == "sort") {
+            if (target.type != Value::ARRAY) throw std::runtime_error("Type Error: sort() called on non-array!");
+            if (!arguments.empty()) throw std::runtime_error("Argument Error: sort() expects 0 arguments.");
+            
+            for(auto& el : target.list){
+                if(el.type != Value::NUMBER) throw std::runtime_error("Value Error: Cannot sort string values!");
+            }
+
+            std::sort(target.list.begin(), target.list.end());
+
+            return Value(true); 
+        }
     } else {
         Value temp = receiver->evaluate(env, currentGroup);
         if (methodName == "size") {
