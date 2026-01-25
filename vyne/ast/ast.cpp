@@ -148,6 +148,18 @@ Value MethodCallNode::evaluate(SymbolContainer& env, std::string currentGroup) c
             target.list.emplace_back(val);
             return val;
         }
+
+        if(methodName == "pop"){
+            if(target.type != Value::ARRAY) throw std::runtime_error("Compilation error : Called method pop() on non-array!");
+            if(target.list.empty()) throw std::runtime_error("Index Error: pop() from empty array.");
+            if(!arguments.empty()) throw std::runtime_error("Argument Error: pop() expects 0 arguments, but got " + std::to_string(arguments.size()) + ".");
+
+            Value lastValue = target.list.back();
+            
+            target.list.pop_back();
+
+            return lastValue;
+        }
     } else {
         Value temp = receiver->evaluate(env, currentGroup);
         if (methodName == "size") {
