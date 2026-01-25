@@ -106,7 +106,9 @@ std::string tokenTypeToString(TokenType type) {
         case TokenType::Comma:            return "','";
 		case TokenType::Semicolon:        return "';'";
 		case TokenType::Dot:              return "'.'";
-        case TokenType::End:              return "end of file";
+		case TokenType::Greater:          return "'>'";
+		case TokenType::Smaller:          return "'<'";
+        case TokenType::End:              return "'end of file'";
         default:                          return "Unknown Token";
     }
 }

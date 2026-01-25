@@ -82,6 +82,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 						}
 					}
 					consume(TokenType::Right_Parenthese);
+					consume(TokenType::Semicolon);
 
 					node = std::make_unique<MethodCallNode>(std::move(node), member.name, std::move(args));
 				} 
@@ -95,6 +96,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 				consume(TokenType::Left_Bracket);
 				auto indexExpr = parseExpression();
 				consume(TokenType::Right_Bracket);
+				consume(TokenType::Semicolon);
 
 				node = std::make_unique<IndexAccessNode>(lastName, scope, std::move(indexExpr));
 			}
@@ -245,5 +247,5 @@ Token Parser::consume(TokenType expected) {
 	}
 	throw std::runtime_error("Error: Unexpected token type! Expected " +
 		tokenTypeToString(expected) + " but got " +
-		tokenTypeToString(peekToken().type));
+		tokenTypeToString(peekToken().type) + " instead.");
 }
