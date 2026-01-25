@@ -5,4 +5,5 @@ group creatures {
     };
 };
 
+name = "gjfdhg;ds"
 log(creatures.human.petuxlar.size());

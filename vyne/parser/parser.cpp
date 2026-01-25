@@ -246,6 +246,6 @@ Token Parser::consume(TokenType expected) {
 		return tokens[pos++];
 	}
 	throw std::runtime_error("Error: Unexpected token type! Expected " +
-		tokenTypeToString(expected) + " but got " +
+		tokenTypeToString(expected) + ", but got " +
 		tokenTypeToString(peekToken().type) + " instead.");
 }
