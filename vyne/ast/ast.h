@@ -77,6 +77,10 @@ public:
     }
 
     Value evaluate(SymbolContainer& forest, std::string currentGroup) const override;
+
+    // getters
+    const std::vector<std::string>& getScope() { return specificGroup; }
+    const std::string& getName()  { return name; }
 };
 
 class AssignmentNode : public ASTNode {
@@ -145,3 +149,18 @@ public :
 
     Value evaluate(SymbolContainer& forest, std::string currentGroup) const override;
 };
+
+class MethodCallNode : public ASTNode {
+    std::unique_ptr<ASTNode> receiver;
+    std::string methodName;
+    std::vector<std::unique_ptr<ASTNode>> arguments;
+
+public:
+    MethodCallNode(std::unique_ptr<ASTNode> recv, std::string method, 
+                   std::vector<std::unique_ptr<ASTNode>> args)
+        : receiver(std::move(recv)), methodName(std::move(method)), arguments(std::move(args)) {}
+
+    Value evaluate(SymbolContainer& forest, std::string currentGroup) const override;
+};
+
+std::string resolvePath(std::vector<std::string> scope, std::string currentGroup);

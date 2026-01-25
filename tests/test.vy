@@ -4,4 +4,4 @@ group human {
     };
 };
 
-log(human.tuncay.id);
+log(human.tuncay);

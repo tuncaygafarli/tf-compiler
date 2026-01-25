@@ -101,24 +101,7 @@ Value ArrayNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
 }
 
 Value IndexAccessNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
-    std::string targetGroup;
-
-    if (scope.empty()) {
-        targetGroup = currentGroup;
-    } else {
-        targetGroup = scope[0];
-        for (size_t i = 1; i < scope.size(); ++i) {
-            targetGroup += "." + scope[i];
-        }
-
-        if (currentGroup == "global" && env.find(targetGroup) == env.end()) {
-            std::string globalPath = "global." + targetGroup;
-            if (env.find(globalPath) != env.end()) {
-                targetGroup = globalPath;
-            }
-        }
-    }
-
+    std::string targetGroup = resolvePath(scope, currentGroup);
 
     if (!env.count(targetGroup) || !env[targetGroup].count(name)) {
         throw std::runtime_error("Array '" + name + "' not found.");
@@ -143,4 +126,45 @@ Value IndexAccessNode::evaluate(SymbolContainer& env, std::string currentGroup) 
     }
 
     return arrayVal.list[i]; 
+}
+
+Value MethodCallNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
+    VariableNode* var = dynamic_cast<VariableNode*>(receiver.get());
+
+    if(var){
+        std::string targetGroup = resolvePath(var->getScope(), currentGroup);
+        Value& target = env[targetGroup][var->getName()];
+
+        if(methodName == "size"){
+            if(target.type != Value::ARRAY) throw std::runtime_error("Compilation error : Called size() on non-array!");
+
+            return Value(static_cast<double>(target.list.size()));
+        }
+    } else {
+        Value temp = receiver->evaluate(env, currentGroup);
+        if (methodName == "size") {
+            if (temp.type != Value::ARRAY) throw std::runtime_error("size() called on non-array.");
+            return Value(static_cast<double>(temp.list.size()));
+        }
+
+        throw std::runtime_error("Cannot modify a literal array!");
+    }
+    
+    throw std::runtime_error("Unknown method: " + methodName);
+}
+
+// helpers
+std::string resolvePath(std::vector<std::string> scope, std::string currentGroup) {
+    std::string targetGroup;
+    
+    if (scope.empty()) {
+        targetGroup = currentGroup;
+    } else {
+        targetGroup = "global";
+        for (const auto& g : scope) {
+            targetGroup += "." + g;
+        }
+    }
+
+    return targetGroup;
 }

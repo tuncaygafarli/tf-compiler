@@ -49,42 +49,47 @@
 		// PARSE IDENTIFIERS
 		if (current.type == TokenType::Identifier) {
 			std::vector<std::string> scope;
-			
 			Token tok = consume(TokenType::Identifier);
-			scope.push_back(std::move(tok.name));
+			
+			std::unique_ptr<ASTNode> node = std::make_unique<VariableNode>(tok.name);
+			std::string lastName = tok.name;
 
-			while (peekToken().type == TokenType::Dot) {
-				consume(TokenType::Dot);
-				tok = consume(TokenType::Identifier);
-				scope.push_back(std::move(tok.name));
-			}
-
-			if (peekToken().type == TokenType::Equals) {
-				consume(TokenType::Equals);
+			while (peekToken().type == TokenType::Dot || peekToken().type == TokenType::Left_Bracket) {
 				
-				std::string varName = scope.back();
-				scope.pop_back();
+				if (peekToken().type == TokenType::Dot) {
+					consume(TokenType::Dot);
+					Token member = consume(TokenType::Identifier);
 
-				auto rhs = parseExpression();
-				consume(TokenType::Semicolon);
+					if (peekToken().type == TokenType::Left_Parenthese) {
+						consume(TokenType::Left_Parenthese);
+						
+						std::vector<std::unique_ptr<ASTNode>> args;
+						if (peekToken().type != TokenType::Right_Parenthese) {
+							args.push_back(parseExpression());
+							while (peekToken().type == TokenType::Comma) {
+								consume(TokenType::Comma);
+								args.push_back(parseExpression());
+							}
+						}
+						consume(TokenType::Right_Parenthese);
 
-				return std::make_unique<AssignmentNode>(varName, std::move(rhs), scope);
+						node = std::make_unique<MethodCallNode>(std::move(node), member.name, std::move(args));
+					} 
+					else {
+						scope.push_back(lastName);
+						lastName = member.name;
+						node = std::make_unique<VariableNode>(lastName, std::vector<std::string>(scope));
+					}
+				} 
+				else if (peekToken().type == TokenType::Left_Bracket) {
+					consume(TokenType::Left_Bracket);
+					auto indexExpr = parseExpression();
+					consume(TokenType::Right_Bracket);
+
+					node = std::make_unique<IndexAccessNode>(lastName, scope, std::move(indexExpr));
+				}
 			}
-
-			std::string varName = scope.back();
-			scope.pop_back();
-
-			if (peekToken().type == TokenType::Left_Bracket) {
-				consume(TokenType::Left_Bracket);
-				
-				auto indexExpr = parseExpression(); 
-				
-				consume(TokenType::Right_Bracket);
-
-				return std::make_unique<IndexAccessNode>(std::move(varName), std::move(scope), std::move(indexExpr));
-			}
-
-			return std::make_unique<VariableNode>(std::move(varName), std::move(scope));
+			return node;
 		}
 
 		if (current.type == TokenType::Left_Parenthese) {
