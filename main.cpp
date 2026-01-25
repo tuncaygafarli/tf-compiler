@@ -7,6 +7,13 @@
 #include "vyne/parser/parser.h"
 #include "vyne/ast/ast.h"
 
+#define RESET   "\033[0m"
+#define RED     "\033[31m"
+#define GREEN   "\033[32m"
+#define YELLOW  "\033[33m"
+#define CYAN    "\033[36m"
+#define BOLD    "\033[1m"
+
 int main(int argc, char* argv[]) {
 	SymbolContainer forest;
 	forest["global"] = {};
@@ -52,9 +59,10 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 
-		std::cout << "Vyne Interpreter Shell (Type 'exit' to quit)" << "\n";
+		std::cout << BOLD << CYAN << "Vyne Interpreter v1.0" << RESET << "\n";
+		std::cout << "Type " << RED << "exit" << RESET <<" to quit.\n\n";
 		while (true) {
-			std::cout << ">> ";
+			std::cout << GREEN << ">> " << RESET;
 			std::getline(std::cin, input);
 
 			if (input == "exit") break;
