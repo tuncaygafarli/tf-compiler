@@ -217,6 +217,18 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 		return std::make_unique<PrintNode>(std::move(expr));
 	}
 
+	// sizeof fnc
+	if (peekToken().type == TokenType::Sizeof) {
+		getNextToken();
+		consume(TokenType::Left_Parenthese);
+
+		auto expr = parseExpression();
+
+		consume(TokenType::Right_Parenthese);
+		consume(TokenType::Semicolon);
+		return std::make_unique<SizeofNode>(std::move(expr));
+	}
+
 	// parsing group nodes
 	if (peekToken().type == TokenType::Group) {
 		consume(TokenType::Group);

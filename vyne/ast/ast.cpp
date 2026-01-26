@@ -89,6 +89,12 @@ Value PrintNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
     return val;
 }
 
+Value SizeofNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
+    Value val = expression->evaluate(env, currentGroup);
+    
+    return Value(static_cast<double>(val.getBytes()));
+}
+
 Value ArrayNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     std::vector<Value> results;
 

@@ -17,6 +17,7 @@ enum class TokenType {
 	Identifier,
 	Equals,
 	Print,
+	Sizeof,
 	String,
 	Group,
 	Left_CB,

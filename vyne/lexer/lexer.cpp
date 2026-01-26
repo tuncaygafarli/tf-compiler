@@ -39,6 +39,10 @@ std::vector<Token> tokenize(const std::string& input) {
 				tokens.emplace_back(TokenType::Print, 0, buffer);
 			}
 
+			if (buffer == "sizeof") {
+				tokens.emplace_back(TokenType::Sizeof, 0, buffer);
+			}
+
 			else if (buffer == "group") {
 				tokens.emplace_back(TokenType::Group, 0, "");
 			}
@@ -97,6 +101,7 @@ std::string tokenTypeToString(TokenType type) {
         case TokenType::Identifier:       return "Identifier";
         case TokenType::Equals:           return "'='";
         case TokenType::Print:            return "'log'";
+		case TokenType::Sizeof:           return "'sizeof'";
         case TokenType::String:           return "String";
         case TokenType::Group:            return "Group";
         case TokenType::Left_CB:          return "'{'";

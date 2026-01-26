@@ -60,6 +60,25 @@ struct Value {
         os << number;
     }
 }
+
+    size_t getBytes() const {
+        switch(type){
+            case NUMBER  :  return sizeof(double);
+            case STRING  :  return text.capacity();
+            case BOOLEAN :  return sizeof(bool);
+            case ARRAY   : {
+                size_t total = 0; // doing base calculation here because also vectors has base size
+
+                for(const auto& el : list){
+                    total += el.getBytes();
+                }
+
+                return total;
+            }
+
+            default : return 0;
+        }
+    }
 };
 
 using SymbolTable  = std::unordered_map<std::string, Value>;
@@ -131,6 +150,13 @@ class PrintNode : public ASTNode {
     std::unique_ptr<ASTNode> expression;
 public:
     PrintNode(std::unique_ptr<ASTNode> expr) : expression(std::move(expr)) {}
+    Value evaluate(SymbolContainer& forest, std::string currentGroup = "global") const override;
+};
+
+class SizeofNode : public ASTNode {
+    std::unique_ptr<ASTNode> expression;
+public:
+    SizeofNode(std::unique_ptr<ASTNode> expr) : expression(std::move(expr)) {}
     Value evaluate(SymbolContainer& forest, std::string currentGroup = "global") const override;
 };
 
