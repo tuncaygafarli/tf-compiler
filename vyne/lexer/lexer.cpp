@@ -48,11 +48,15 @@ std::vector<Token> tokenize(const std::string& input) {
 			}
 
 			else if (buffer == "true"){
-				tokens.emplace_back(TokenType::True, 1, "true");
+				tokens.emplace_back(TokenType::Number, 1, "");
 			}
 
 			else if (buffer == "false"){
-				tokens.emplace_back(TokenType::False, 0, "false");
+				tokens.emplace_back(TokenType::Number, 0, "");
+			}
+
+			else if (buffer == "null"){
+				tokens.emplace_back(TokenType::Number, 0, "");
 			}
 
 			else {
@@ -103,6 +107,9 @@ std::string tokenTypeToString(TokenType type) {
         case TokenType::Print:            return "'log'";
 		case TokenType::Sizeof:           return "'sizeof'";
         case TokenType::String:           return "String";
+		case TokenType::True:             return "'true'";
+		case TokenType::False:            return "'false'";
+		case TokenType::Null:             return "'null'";
         case TokenType::Group:            return "Group";
         case TokenType::Left_CB:          return "'{'";
         case TokenType::Right_CB:         return "'}'";

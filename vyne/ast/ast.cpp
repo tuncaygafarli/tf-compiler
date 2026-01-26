@@ -66,6 +66,16 @@ Value BinOpNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
         throw std::runtime_error("Type Error: Only '+' allowed for strings.");
     }
 
+    if (l.type == Value::ARRAY && r.type == Value::ARRAY) {
+        if (op == '+') {
+            Value result = l;
+
+            result.list.insert(result.list.end(), r.list.begin(), r.list.end());
+            return result;
+        }
+        throw std::runtime_error("Type Error: Only '+' allowed for strings, numbers and arrays.");
+    }
+
     if ((l.type == Value::STRING) != (r.type == Value::STRING)) {
         throw std::runtime_error("Type Error: Cannot mix strings and numbers!");
     }

@@ -8,11 +8,10 @@
 #include <stdexcept>
 
 struct Value {
-    enum Type { NUMBER, STRING, ARRAY, TABLE, NONE, BOOLEAN };
+    enum Type { NUMBER, STRING, ARRAY, TABLE, NONE };
     Type type = NONE;
 
     double number = 0;
-    bool boolean;
     std::string text;
     std::vector<Value> list;
     std::unordered_map<std::string, Value> table;
@@ -20,7 +19,6 @@ struct Value {
     Value() : type(NONE) {}
     Value(double n) : type(NUMBER), number(n) {}
     Value(std::string s) : type(STRING), text(std::move(s)) {}
-    Value(bool b) : type(BOOLEAN), boolean(std::move(b)) {}
     Value(std::vector<Value> l) : type(ARRAY), list(std::move(l)) {}
     Value(std::unordered_map<std::string, Value> t) : type(TABLE), table(std::move(t)) {}
 
@@ -28,7 +26,6 @@ struct Value {
         if (type != other.type) return false;
         if (type == NUMBER) return number == other.number;
         if (type == STRING) return text == other.text;
-        if (type == BOOLEAN) return boolean == other.boolean;
         if (type == NONE) return true;
 
         return false; 
@@ -54,8 +51,6 @@ struct Value {
         os << "}";
     } else if (type == Type::STRING) {
         os << "\"" << text << "\"";
-    } else if (type == Type::BOOLEAN) {
-        os << (boolean ? "true" : "false");
     } else {
         os << number;
     }
@@ -65,7 +60,6 @@ struct Value {
         switch(type){
             case NUMBER  :  return sizeof(double);
             case STRING  :  return text.length() * sizeof(char);
-            case BOOLEAN :  return sizeof(bool);
             case ARRAY   : {
                 size_t total = 0; // doing base calculation here because also vectors has base size
 

@@ -29,6 +29,7 @@ enum class TokenType {
 	Dot,
 	False,
 	True,
+	Null,
 	End
 };
 
