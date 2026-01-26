@@ -64,7 +64,7 @@ struct Value {
     size_t getBytes() const {
         switch(type){
             case NUMBER  :  return sizeof(double);
-            case STRING  :  return text.capacity();
+            case STRING  :  return text.length() * sizeof(char);
             case BOOLEAN :  return sizeof(bool);
             case ARRAY   : {
                 size_t total = 0; // doing base calculation here because also vectors has base size
