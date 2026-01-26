@@ -16,13 +16,11 @@ Value VariableNode::evaluate(SymbolContainer& env, std::string currentGroup) con
         }
     }
 
-    std::string nameStr(name); 
-
-    if (env.count(targetGroup) && env[targetGroup].count(nameStr)) {
-        return env[targetGroup][nameStr];
+    if (env.count(targetGroup) && env[targetGroup].count(name)) {
+        return env[targetGroup][name];
     }
 
-    throw std::runtime_error("Variable '" + std::string(name) + "' not found in " + targetGroup);
+    throw std::runtime_error("Variable '" + name + "' not found in " + targetGroup);
 }
 
 Value AssignmentNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
@@ -97,8 +95,10 @@ Value BinOpNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
 
 Value PrintNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     Value val = expression->evaluate(env, currentGroup);
-    val.print(std::cout);
-    return val;
+    
+    val.print(std::cout); 
+
+    return Value(); 
 }
 
 Value SizeofNode::evaluate(SymbolContainer& env, std::string currentGroup) const {

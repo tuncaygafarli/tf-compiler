@@ -42,19 +42,20 @@ struct Value {
     }
 
     void print(std::ostream& os) const {
-    if (type == Type::ARRAY) {
-        os << "{";
-        for (size_t i = 0; i < list.size(); ++i) {
-            list[i].print(os);
-            if (i < list.size() - 1) os << ", ";
+        if (type == Type::NONE) return;
+        if (type == Type::ARRAY) {
+            os << "{";
+            for (size_t i = 0; i < list.size(); ++i) {
+                list[i].print(os);
+                if (i < list.size() - 1) os << ", ";
+            }
+            os << "}";
+        } else if (type == Type::STRING) {
+            os << "\"" << text << "\"";
+        } else {
+            os << number;
         }
-        os << "}";
-    } else if (type == Type::STRING) {
-        os << "\"" << text << "\"";
-    } else {
-        os << number;
     }
-}
 
     size_t getBytes() const {
         switch(type){
@@ -104,10 +105,10 @@ public:
 };
 
 class VariableNode : public ASTNode {
-    std::string_view name;
+    std::string name;
     std::vector<std::string> specificGroup;
 public:
-    VariableNode(std::string_view name, std::vector<std::string>&& group = {})
+    VariableNode(std::string name, std::vector<std::string>&& group = {})
         : name(std::move(name)), specificGroup(std::move(group)) {
     }
 

@@ -34,7 +34,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 	// PARSE STRINGS
 	if (current.type == TokenType::String) {
 		getNextToken();
-		return std::make_unique<StringNode>(std::string(current.name));
+		return std::make_unique<StringNode>(current.name);
 	}
 
 	// PARSE NUMBERS
@@ -60,7 +60,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 		Token tok = consume(TokenType::Identifier);
 		
 		std::unique_ptr<ASTNode> node = std::make_unique<VariableNode>(tok.name);
-		std::string lastName = std::string(tok.name);
+		std::string lastName = tok.name;
 
 		while (peekToken().type == TokenType::Dot || peekToken().type == TokenType::Left_Bracket) {
 			
@@ -84,7 +84,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 					consume(TokenType::Right_Parenthese);
 					consume(TokenType::Semicolon);
 
-					node = std::make_unique<MethodCallNode>(std::move(node), std::string(member.name), std::move(args));
+					node = std::make_unique<MethodCallNode>(std::move(node), member.name, std::move(args));
 				} 
 				else {
 					scope.emplace_back(lastName);
@@ -233,7 +233,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 	if (peekToken().type == TokenType::Group) {
 		consume(TokenType::Group);
 
-		std::string treeName = std::string(consume(TokenType::Identifier).name);
+		std::string treeName = consume(TokenType::Identifier).name;
 
 		consume(TokenType::Left_CB);
 
