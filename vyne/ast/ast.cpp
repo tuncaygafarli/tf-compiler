@@ -174,8 +174,12 @@ Value FunctionCallNode::evaluate(SymbolContainer& env, std::string currentGroup)
     }
 
     Value result;
-    for (const auto& bodyNode : funcVal.function->body){
-        result = bodyNode->evaluate(env, localScope);
+    try {
+        for (const auto& bodyNode : funcVal.function->body){
+            result = bodyNode->evaluate(env, localScope);
+        }
+    } catch (const ReturnException& e) {
+        result = e.value; 
     }
 
     env.erase(localScope);

@@ -15,10 +15,10 @@
 #define BOLD    "\033[1m"
 
 int main(int argc, char* argv[]) {
-	SymbolContainer forest;
-	forest["global"] = {};
+	SymbolContainer env;
+	env["global"] = {};
 	
-	forest["global"]["pi"] = 3.14159;
+	env["global"]["pi"] = 3.14159;
 
 	std::string input;
 
@@ -44,12 +44,16 @@ int main(int argc, char* argv[]) {
 		auto tokens = tokenize(content);
 
 		Parser parser(tokens);
-
+		
 		try {
 			while (parser.peekToken().type != TokenType::End) {
 				auto ast = parser.parseStatement();
 				if (ast) {
-					ast->evaluate(forest);
+					try {
+						ast->evaluate(env);
+					} catch (const ReturnException& e) {
+						break; 
+					}
 				}
 			}
 		} catch (const std::exception& e) {
@@ -70,10 +74,10 @@ int main(int argc, char* argv[]) {
 
 			// debug commands
 			if (input == "view tree") {
-				std::cout << "--- Current Symbol Forest ---" << "\n";
+				std::cout << "--- Current Symbol env ---" << "\n";
 				bool hasAnyVariables = false;
 
-				for (const auto& [groupName, table] : forest) {
+				for (const auto& [groupName, table] : env) {
 					for (const auto& [varName, val] : table) {
 						hasAnyVariables = true;
 
@@ -104,7 +108,7 @@ int main(int argc, char* argv[]) {
 				if (root) {
 					Value result;
 					try {
-						result = root->evaluate(forest); 
+						result = root->evaluate(env); 
 					} 
 					catch (const ReturnException& e) {
 						result = e.value; 
