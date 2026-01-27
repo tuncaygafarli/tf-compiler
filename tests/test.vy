@@ -1,6 +1,9 @@
 names = {"Tuncay","Qurban","Hossain"};
+
 group People {
-    x = names;
+    workers = names;
 };
 
-log(People.x);
+People.workers.push("Mirdjafar");
+
+log(People.workers);

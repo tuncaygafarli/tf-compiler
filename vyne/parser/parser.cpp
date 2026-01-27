@@ -58,43 +58,35 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 	// x.pos = 5;
 	if (current.type == TokenType::Identifier) {
 		if (current.name == "return" || current.name == "sub" || current.name == "log") {
-        	throw std::runtime_error("Syntax Error : Unexpected keyword '" + current.name + "' in expression");
-    	}	
+			throw std::runtime_error("Syntax Error : Unexpected keyword '" + current.name + "'");
+		}
 
 		std::vector<std::string> scope;
 		Token tok = consume(TokenType::Identifier);
-
 		std::unique_ptr<ASTNode> node = std::make_unique<VariableNode>(tok.name);
 		std::string lastName = tok.name;
 
-		if(peekToken().type == TokenType::Left_Parenthese){
+		if (peekToken().type == TokenType::Left_Parenthese) {
 			consume(TokenType::Left_Parenthese);
 			std::vector<std::unique_ptr<ASTNode>> args;
-
-			if(peekToken().type != TokenType::Right_Parenthese){
+			if (peekToken().type != TokenType::Right_Parenthese) {
 				args.emplace_back(parseExpression());
 				while (peekToken().type == TokenType::Comma) {
 					consume(TokenType::Comma);
 					args.emplace_back(parseExpression());
 				}
-
-				consume(TokenType::Right_Parenthese);
-        
-        		return std::make_unique<FunctionCallNode>(std::move(lastName), std::move(args));
 			}
+			consume(TokenType::Right_Parenthese);
+			node = std::make_unique<FunctionCallNode>(lastName, std::move(args));
 		}
 
 		while (peekToken().type == TokenType::Dot || peekToken().type == TokenType::Left_Bracket) {
-			
 			if (peekToken().type == TokenType::Dot) {
 				consume(TokenType::Dot);
 				Token member = consume(TokenType::Identifier);
 
-				// if it sees (, then it is definitely a method
-				// so it will try to parse its args
 				if (peekToken().type == TokenType::Left_Parenthese) {
 					consume(TokenType::Left_Parenthese);
-					
 					std::vector<std::unique_ptr<ASTNode>> args;
 					if (peekToken().type != TokenType::Right_Parenthese) {
 						args.emplace_back(parseExpression());
@@ -104,23 +96,17 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 						}
 					}
 					consume(TokenType::Right_Parenthese);
-					consume(TokenType::Semicolon);
-
 					node = std::make_unique<MethodCallNode>(std::move(node), member.name, std::move(args));
-				} 
-				else {
+				} else {
 					scope.emplace_back(lastName);
 					lastName = member.name;
-					node = std::make_unique<VariableNode>(lastName, std::vector<std::string>(scope));
+					node = std::make_unique<VariableNode>(std::move(lastName), std::move(scope));
 				}
-			} 
-			else if (peekToken().type == TokenType::Left_Bracket) {
+			} else if (peekToken().type == TokenType::Left_Bracket) {
 				consume(TokenType::Left_Bracket);
 				auto indexExpr = parseExpression();
 				consume(TokenType::Right_Bracket);
-				consume(TokenType::Semicolon);
-
-				node = std::make_unique<IndexAccessNode>(lastName, scope, std::move(indexExpr));
+				node = std::make_unique<IndexAccessNode>(std::move(lastName), std::move(scope), std::move(indexExpr));
 			}
 		}
 		return node;
@@ -306,7 +292,9 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 		return std::make_unique<GroupNode>(treeName, std::move(statements));
 	}
 	
-	return parseExpression();
+	auto expr = parseExpression();
+    consumeSemicolon(); 
+    return expr;
 }
 
 Token Parser::consume(TokenType expected) {
