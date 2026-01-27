@@ -1,4 +1,7 @@
-x = {1, 2, 5, 7, 3, 6, 5};
+group Boys {
+    list = {"dog","cat"};
+};
 
-x.sort();
-log(x);
+Boys.list.push("bat");
+
+log(Boys.list);

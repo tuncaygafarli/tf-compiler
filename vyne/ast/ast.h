@@ -116,7 +116,7 @@ public:
 
     // getters
     const std::vector<std::string>& getScope() { return specificGroup; }
-    const std::string_view& getName()  { return name; }
+    const std::string& getName()  { return name; }
 };
 
 class AssignmentNode : public ASTNode {

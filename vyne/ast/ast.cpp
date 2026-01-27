@@ -150,8 +150,7 @@ Value MethodCallNode::evaluate(SymbolContainer& env, std::string currentGroup) c
 
     if(var){
         std::string targetGroup = resolvePath(var->getScope(), currentGroup);
-        std::string varName(var->getName());
-        Value& target = env[targetGroup][varName];
+        Value& target = env[targetGroup][var->getName()];
 
         /*
             Array methods are implemented from here
