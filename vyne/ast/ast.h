@@ -163,19 +163,14 @@ public:
     }
     Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
 };
-
-class PrintNode : public ASTNode {
-    std::unique_ptr<ASTNode> expression;
+class BuiltInCallNode : public ASTNode {
+    std::string funcName;
+    std::vector<std::unique_ptr<ASTNode>> arguments;
 public:
-    PrintNode(std::unique_ptr<ASTNode> expr) : expression(std::move(expr)) {}
-    Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
-};
+    BuiltInCallNode(std::string name, std::vector<std::unique_ptr<ASTNode>> args) 
+        : funcName(std::move(name)), arguments(std::move(args)) {}
 
-class SizeofNode : public ASTNode {
-    std::unique_ptr<ASTNode> expression;
-public:
-    SizeofNode(std::unique_ptr<ASTNode> expr) : expression(std::move(expr)) {}
-    Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
+    Value evaluate(SymbolContainer& env, std::string currentGroup) const override;
 };
 
 class StringNode : public ASTNode {

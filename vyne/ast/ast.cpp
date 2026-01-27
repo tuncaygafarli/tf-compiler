@@ -92,20 +92,6 @@ Value BinOpNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
     }
 }
 
-Value PrintNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
-    Value val = expression->evaluate(env, currentGroup);
-    
-    val.print(std::cout); 
-
-    return Value(); 
-}
-
-Value SizeofNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
-    Value val = expression->evaluate(env, currentGroup);
-    
-    return Value(static_cast<double>(val.getBytes()));
-}
-
 Value ArrayNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     std::vector<Value> results;
 
@@ -114,6 +100,24 @@ Value ArrayNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
     }
 
     return Value(results);
+}
+
+Value BuiltInCallNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
+    std::vector<Value> argValues;
+    for (auto& arg : arguments) {
+        argValues.push_back(arg->evaluate(env, currentGroup));
+    }
+
+    if (funcName == "log") {
+        if (!argValues.empty()) argValues[0].print(std::cout);
+        return Value();
+    } 
+    else if (funcName == "sizeof") {
+        if (argValues.empty()) return Value(0.0);
+        return Value(static_cast<double>(argValues[0].getBytes()));
+    }
+
+    throw std::runtime_error("Unknown built-in function: " + funcName);
 }
 
 Value IndexAccessNode::evaluate(SymbolContainer& env, std::string currentGroup) const {

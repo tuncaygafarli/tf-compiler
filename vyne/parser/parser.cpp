@@ -165,15 +165,25 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 		return std::make_unique<FunctionNode>(std::move(funcName),std::move(params), std::move(body));
 	}
 
-	// sizeof fnc
-	if (peekToken().type == TokenType::Sizeof) {
-		getNextToken();
-		consume(TokenType::Left_Parenthese);
+	// for built-in functions
+	if (peekToken().type == TokenType::BuiltIn) {
+		Token funcToken = consume(TokenType::BuiltIn);
+		std::string name = funcToken.name;
 
-		auto expr = parseExpression();
+		consume(TokenType::Left_Parenthese);
+		std::vector<std::unique_ptr<ASTNode>> args;
+
+		if (peekToken().type != TokenType::Right_Parenthese) {
+			args.emplace_back(parseExpression());
+			while (peekToken().type == TokenType::Comma) {
+				consume(TokenType::Comma);
+				args.emplace_back(parseExpression());
+			}
+		}
 
 		consume(TokenType::Right_Parenthese);
-		return std::make_unique<SizeofNode>(std::move(expr));
+		
+		return std::make_unique<BuiltInCallNode>(name, std::move(args));
 	}
 
 	throw std::runtime_error("Expected number, identifier, or parenthesis");
@@ -260,18 +270,6 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 		}
 	}
 
-	// log function
-	if (peekToken().type == TokenType::Print) {
-		getNextToken();
-		consume(TokenType::Left_Parenthese);
-
-		auto expr = parseExpression();
-
-		consume(TokenType::Right_Parenthese);
-		consumeSemicolon();
-		return std::make_unique<PrintNode>(std::move(expr));
-	}
-
 	// parsing group nodes
 	if (peekToken().type == TokenType::Group) {
 		consume(TokenType::Group);
@@ -291,6 +289,8 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 
 		return std::make_unique<GroupNode>(treeName, std::move(statements));
 	}
+
+
 	
 	auto expr = parseExpression();
     consumeSemicolon(); 

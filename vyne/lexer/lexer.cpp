@@ -36,10 +36,10 @@ std::vector<Token> tokenize(const std::string& input) {
 			--i;
 
 			if (buffer == "log") {
-				tokens.emplace_back(TokenType::Print, 0, buffer);
+				tokens.emplace_back(TokenType::BuiltIn, 0, buffer);
 			}
 			else if (buffer == "sizeof") {
-				tokens.emplace_back(TokenType::Sizeof, 0, buffer);
+				tokens.emplace_back(TokenType::BuiltIn, 0, buffer);
 			}
 			else if (buffer == "group") {
 				tokens.emplace_back(TokenType::Group, 0, "");
@@ -58,9 +58,6 @@ std::vector<Token> tokenize(const std::string& input) {
 			}
 			else if (buffer == "return") {
 				tokens.emplace_back(TokenType::Return, 0, buffer);
-			}
-			else if (buffer == "swap") {
-				tokens.emplace_back(TokenType::Swap, 0, buffer);
 			}
 			else {
 				tokens.emplace_back(TokenType::Identifier, 0, buffer);
@@ -107,8 +104,6 @@ std::string tokenTypeToString(TokenType type) {
         case TokenType::Right_Parenthese: return "')'";
         case TokenType::Identifier:       return "Identifier";
         case TokenType::Equals:           return "'='";
-        case TokenType::Print:            return "'log'";
-		case TokenType::Sizeof:           return "'sizeof'";
         case TokenType::String:           return "String";
 		case TokenType::True:             return "'true'";
 		case TokenType::False:            return "'false'";
@@ -123,6 +118,7 @@ std::string tokenTypeToString(TokenType type) {
 		case TokenType::Dot:              return "'.'";
 		case TokenType::Greater:          return "'>'";
 		case TokenType::Smaller:          return "'<'";
+		case TokenType::BuiltIn:          return "'BuiltIn'";
         case TokenType::End:              return "'end of file'";
         default:                          return "Unknown Token";
     }

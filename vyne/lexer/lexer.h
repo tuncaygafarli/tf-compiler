@@ -32,10 +32,8 @@ enum class TokenType {
 	Semicolon,
 	Dot,
 	// Built-in keywords
-	Print,
-	Sizeof,
+	BuiltIn,
 	Return,
-	Swap,
 	End
 };
 
