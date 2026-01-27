@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <variant>
+#include <sstream>
 
 class ASTNode;
 struct Value {
@@ -100,6 +101,26 @@ struct Value {
 
             default :
                 return 0;
+        }
+    }
+
+    std::string toString() const {
+        switch(data.index()) {
+            case 1: {
+                std::string s = std::to_string(std::get<double>(data));
+                s.erase(s.find_last_not_of('0') + 1, std::string::npos);
+                if(s.back() == '.') s.pop_back();
+                return s;
+            }
+            case 2:
+                return std::get<std::string>(data);
+            case 0: 
+                return "null";
+            default: {
+                std::stringstream ss;
+                this->print(ss);
+                return ss.str();
+            }
         }
     }
 
