@@ -33,6 +33,7 @@ enum class TokenType {
 	Dot,
 	// Built-in keywords
 	BuiltIn,
+	While,
 	Return,
 	End
 };
@@ -51,3 +52,4 @@ struct Token {
 
 std::vector<Token> tokenize(const std::string& input);
 std::string tokenTypeToString(TokenType type);
+char advance();

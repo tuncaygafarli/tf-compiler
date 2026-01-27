@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
 			}
 			auto end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> ms = end - start;
-			std::cout << "\n\nExecution finished in: " << ms.count() << "ms";
+			std::cout << "\nExecution finished in: " << ms.count() << "ms";
 		} catch (const std::exception& e) {
 			std::cerr << "Compilation Error: " << e.what() << "\n";
 		}
@@ -118,9 +118,10 @@ int main(int argc, char* argv[]) {
 					catch (const ReturnException& e) {
 						result = e.value; 
 					}
-					
-					result.print(std::cout);
-					std::cout << "\n";
+					if (result.getType() != Value::NONE) { 
+						result.print(std::cout);
+						std::cout << "\n";
+					}
 				}
 			}
 			catch (const std::exception& e) {

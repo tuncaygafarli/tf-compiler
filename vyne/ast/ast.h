@@ -63,12 +63,12 @@ struct Value {
             case 3 : {
                 const auto& list = std::get<std::vector<Value>>(data);
 
-                os << "{";
+                os << "[";
                 for (size_t i = 0; i < list.size(); ++i) {
                     list[i].print(os);
                     if (i < list.size() - 1) os << ", ";
                 }
-                os << "}";
+                os << "]";
                 break;
             }
 
@@ -134,6 +134,9 @@ struct Value {
 struct ReturnException {
     Value value;
 };
+
+struct BreakException {};
+struct ContinueException {};
 
 using SymbolTable  = std::unordered_map<std::string, Value>;
 using SymbolContainer = std::unordered_map<std::string, SymbolTable>;
@@ -268,14 +271,14 @@ public:
     FunctionCallNode(std::string name, std::vector<std::unique_ptr<ASTNode>> args)
         : funcName(std::move(name)), arguments(std::move(args)) {}
 
-    Value evaluate(SymbolContainer& env, std::string currentGroup) const override;
+    Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
 };
 
 class ReturnNode : public ASTNode {
     std::unique_ptr<ASTNode> expression;
 public:
     ReturnNode(std::unique_ptr<ASTNode> expr) : expression(std::move(expr)) {}
-    Value evaluate(SymbolContainer& env, std::string currentGroup) const override;
+    Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
 };
 
 class MethodCallNode : public ASTNode {
@@ -288,7 +291,42 @@ public:
                    std::vector<std::unique_ptr<ASTNode>> args)
         : receiver(std::move(recv)), methodName(std::move(method)), arguments(std::move(args)) {}
 
+    Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
+};
+
+// while statements
+class WhileNode : public ASTNode {
+    std::unique_ptr<ASTNode> condition;
+    std::unique_ptr<ASTNode> body;
+
+public:
+    WhileNode(std::unique_ptr<ASTNode> c, std::unique_ptr<ASTNode> b)
+        : condition(std::move(c)), body(std::move(b)) {}
+
+    Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
+};
+
+class BlockNode : public ASTNode {
+public:
+    std::vector<std::shared_ptr<ASTNode>> statements;
+
+    BlockNode(std::vector<std::shared_ptr<ASTNode>> stmts) 
+        : statements(std::move(stmts)) {}
+
     Value evaluate(SymbolContainer& env, std::string currentGroup) const override;
 };
+
+struct BreakNode : public ASTNode {
+    Value evaluate(SymbolContainer& env, std::string currentGroup) const override {
+        throw BreakException();
+    }
+};
+
+struct ContinueNode : public ASTNode {
+    Value evaluate(SymbolContainer& env, std::string currentGroup) const override {
+        throw ContinueException();
+    }
+};
+
 
 std::string resolvePath(std::vector<std::string> scope, std::string currentGroup);

@@ -119,12 +119,12 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 		return node;
 	}
 
-	if(current.type == TokenType::Left_CB){
-		consume(TokenType::Left_CB);
+	if(current.type == TokenType::Left_Bracket){
+		consume(TokenType::Left_Bracket);
 
 		std::vector<std::unique_ptr<ASTNode>> elements;
 
-		if(peekToken().type != TokenType::Right_CB){
+		if(peekToken().type != TokenType::Right_Bracket){
 			elements.emplace_back(parseExpression());
 
 			while(peekToken().type == TokenType::Comma){
@@ -133,7 +133,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 			}
 		}
 
-		consume(TokenType::Right_CB);
+		consume(TokenType::Right_Bracket);
 		return std::make_unique<ArrayNode>(std::move(elements));
 	}
 
@@ -234,6 +234,18 @@ std::unique_ptr<ASTNode> Parser::parseExpression() {
 std::unique_ptr<ASTNode> Parser::parseStatement() {
 	Token current = peekToken();
 
+	if (current.type == TokenType::Left_CB) {
+        consume(TokenType::Left_CB);
+        std::vector<std::shared_ptr<ASTNode>> statements;
+        
+        while (peekToken().type != TokenType::Right_CB && peekToken().type != TokenType::End) {
+            statements.emplace_back(parseStatement());
+        }
+        
+        consume(TokenType::Right_CB);
+        return std::make_unique<BlockNode>(std::move(statements));
+    }
+
 	// return keyword
 	if (current.type == TokenType::Return) {
         consume(TokenType::Return);
@@ -271,7 +283,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 	}
 
 	// parsing group nodes
-	if (peekToken().type == TokenType::Group) {
+	if (current.type == TokenType::Group) {
 		consume(TokenType::Group);
 
 		std::string treeName = consume(TokenType::Identifier).name;
@@ -285,13 +297,21 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 		}
 
 		consume(TokenType::Right_CB);
-		consume(TokenType::Semicolon);
+		consumeSemicolon();
 
 		return std::make_unique<GroupNode>(treeName, std::move(statements));
 	}
 
+	if (current.type == TokenType::While) {
+		consume(TokenType::While);
+		consume(TokenType::Left_Parenthese);
+		auto condition = parseExpression();
+		consume(TokenType::Right_Parenthese);
 
-	
+		auto body = parseStatement();
+		return std::make_unique<WhileNode>(std::move(condition), std::move(body));
+	}
+
 	auto expr = parseExpression();
     consumeSemicolon(); 
     return expr;

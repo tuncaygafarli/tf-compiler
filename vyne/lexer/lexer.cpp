@@ -1,96 +1,103 @@
 #include "lexer.h"
 
 std::vector<Token> tokenize(const std::string& input) {
-	std::vector<Token> tokens;
+    std::vector<Token> tokens;
+    size_t i = 0;
 
-	for (int i = 0; i < input.length(); i++) {
-		char character = input[i];
+    while (i < input.length()) {
+        char character = input[i];
 
-		if (std::isspace(character)) continue;
+        if (std::isspace(character)) {
+            i++;
+            continue;
+        }
 
-		if (character == '"') {
-			std::string buffer;
-			i++;
-			while (i < input.length() && input[i] != '"') {
-				buffer += input[i++];
-			}
-			tokens.push_back({ TokenType::String, 0, buffer });
-			continue;
-		}
+        if (character == '"') {
+            i++;
+            std::string strBuffer;
 
-		if (std::isdigit(character)) {
-			std::string buffer;
+            while (i < input.length() && input[i] != '"') {
+                if (input[i] == '\\' && i + 1 < input.length()) {
+                    if (input[i+1] == 'n') {
+                        strBuffer += '\n';
+                        i += 2;
+                        continue;
+                    } else if (input[i+1] == 't') {
+                        strBuffer += '\t';
+                        i += 2;
+                        continue;
+                    } else if (input[i+1] == '\"') {
+                        strBuffer += '\"';
+                        i += 2;
+                        continue;
+                    }
+                }
+                strBuffer += input[i];
+                i++;
+            }
 
-			while (i < input.length() && (std::isdigit(input[i]) || input[i] == '.')) {
-				buffer += input[i++];
-			}
-			--i;
-			tokens.emplace_back(TokenType::Number, std::stod(buffer));
-		}
+            if (i < input.length()) {
+                i++;
+            }
+            tokens.push_back(Token(TokenType::String, 0, strBuffer));
+            continue;
+        }
 
-		else if (std::isalpha(character) || character == '_') {
-			std::string buffer;
-			while ((i < input.length() && std::isalnum(input[i])) || input[i] == '_' ) {
-				buffer += input[i++];
-			}
-			--i;
+        if (std::isdigit(character)) {
+            std::string buffer;
+            while (i < input.length() && (std::isdigit(input[i]) || input[i] == '.')) {
+                buffer += input[i++];
+            }
+            tokens.emplace_back(TokenType::Number, std::stod(buffer));
+            continue;
+        }
 
-			if (buffer == "log") {
-				tokens.emplace_back(TokenType::BuiltIn, 0, buffer);
-			}
-			else if (buffer == "sizeof") {
-				tokens.emplace_back(TokenType::BuiltIn, 0, buffer);
-			}
-			else if (buffer == "group") {
-				tokens.emplace_back(TokenType::Group, 0, "");
-			}
-			else if (buffer == "true") {
-				tokens.emplace_back(TokenType::Number, 1, "");
-			}
-			else if (buffer == "false") {
-				tokens.emplace_back(TokenType::Number, 0, "");
-			}
-			else if (buffer == "null") {
-				tokens.emplace_back(TokenType::Number, 0, "");
-			}
-			else if (buffer == "sub") {
-				tokens.emplace_back(TokenType::Function, 0, buffer);
-			}
-			else if (buffer == "return") {
-				tokens.emplace_back(TokenType::Return, 0, buffer);
-			}
-			else {
-				tokens.emplace_back(TokenType::Identifier, 0, buffer);
-			}
-		}
+        if (std::isalpha(character) || character == '_') {
+            std::string buffer;
+            while (i < input.length() && (std::isalnum(input[i]) || input[i] == '_')) {
+                buffer += input[i++];
+            }
 
-		else {
-			switch (character) {
-			case '+' : tokens.emplace_back(TokenType::Add, 0, ""); break;
-			case '-' : tokens.emplace_back(TokenType::Substract, 0, ""); break;
-			case '*' : tokens.emplace_back(TokenType::Multiply, 0, ""); break;
-			case '/' : tokens.emplace_back(TokenType::Division, 0, ""); break;
-			case '(' : tokens.emplace_back(TokenType::Left_Parenthese, 0, ""); break;
-			case ')' : tokens.emplace_back(TokenType::Right_Parenthese, 0, ""); break;
-			case '=' : tokens.emplace_back(TokenType::Equals, 0, ""); break;
-			case '{' : tokens.emplace_back(TokenType::Left_CB, 0, ""); break;
-			case '}' : tokens.emplace_back(TokenType::Right_CB, 0, ""); break;
-			case '[' : tokens.emplace_back(TokenType::Left_Bracket, 0, ""); break;
-			case ']' : tokens.emplace_back(TokenType::Right_Bracket, 0, ""); break;
-			case ',' : tokens.emplace_back(TokenType::Comma, 0, ""); break;
-			case ';' : tokens.emplace_back(TokenType::Semicolon, 0, ""); break;
-			case '<' : tokens.emplace_back(TokenType::Smaller, 0, ""); break;
-			case '>' : tokens.emplace_back(TokenType::Greater, 0, ""); break;
-			case '.' : tokens.emplace_back(TokenType::Dot, 0, ""); break;
-			default:
-				std::cerr << "Unexpected character: " << character << std::endl;
-				break;
-			}
-		}
-	}
+            if (buffer == "log") tokens.emplace_back(TokenType::BuiltIn, 0, buffer);
+            else if (buffer == "sizeof") tokens.emplace_back(TokenType::BuiltIn, 0, buffer);
+            else if (buffer == "group") tokens.emplace_back(TokenType::Group, 0, "");
+            else if (buffer == "true") tokens.emplace_back(TokenType::True, 0, "");
+            else if (buffer == "false") tokens.emplace_back(TokenType::False, 0, "");
+            else if (buffer == "null") tokens.emplace_back(TokenType::Null, 0, "");
+            else if (buffer == "sub") tokens.emplace_back(TokenType::Function, 0, buffer);
+            else if (buffer == "return") tokens.emplace_back(TokenType::Return, 0, buffer);
+            else if (buffer == "while") tokens.emplace_back(TokenType::While, 0, buffer);
+            else tokens.emplace_back(TokenType::Identifier, 0, buffer);
+            continue;
+        }
 
-	tokens.emplace_back(TokenType::End, 0);
-	return tokens;
+        // single char tokens
+        switch (character) {
+            case '+': tokens.emplace_back(TokenType::Add, 0, ""); break;
+            case '-': tokens.emplace_back(TokenType::Substract, 0, ""); break;
+            case '*': tokens.emplace_back(TokenType::Multiply, 0, ""); break;
+            case '/': tokens.emplace_back(TokenType::Division, 0, ""); break;
+            case '(': tokens.emplace_back(TokenType::Left_Parenthese, 0, ""); break;
+            case ')': tokens.emplace_back(TokenType::Right_Parenthese, 0, ""); break;
+            case '=': tokens.emplace_back(TokenType::Equals, 0, ""); break;
+            case '{': tokens.emplace_back(TokenType::Left_CB, 0, ""); break;
+            case '}': tokens.emplace_back(TokenType::Right_CB, 0, ""); break;
+            case '[': tokens.emplace_back(TokenType::Left_Bracket, 0, ""); break;
+            case ']': tokens.emplace_back(TokenType::Right_Bracket, 0, ""); break;
+            case ',': tokens.emplace_back(TokenType::Comma, 0, ""); break;
+            case ';': tokens.emplace_back(TokenType::Semicolon, 0, ""); break;
+            case '<': tokens.emplace_back(TokenType::Smaller, 0, ""); break;
+            case '>': tokens.emplace_back(TokenType::Greater, 0, ""); break;
+            case '.': tokens.emplace_back(TokenType::Dot, 0, ""); break;
+            default:
+                std::cerr << "Unexpected character: " << character << std::endl;
+                break;
+        }
+        i++;
+    }
+
+    tokens.emplace_back(TokenType::End, 0);
+    return tokens;
 }
 
 std::string tokenTypeToString(TokenType type) {

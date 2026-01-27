@@ -109,9 +109,12 @@ Value BuiltInCallNode::evaluate(SymbolContainer& env, std::string currentGroup) 
     }
 
     if (funcName == "log") {
-        if (!argValues.empty()) argValues[0].print(std::cout);
+        if (!argValues.empty()) {
+            argValues[0].print(std::cout);
+            std::cout << std::endl;
+        }
         return Value();
-    } 
+    }
     else if (funcName == "sizeof") {
         if (argValues.empty()) return Value(0.0);
         return Value(static_cast<double>(argValues[0].getBytes()));
@@ -282,6 +285,35 @@ Value MethodCallNode::evaluate(SymbolContainer& env, std::string currentGroup) c
     throw std::runtime_error("Unknown method: " + methodName);
 }
 
+Value WhileNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
+    Value result;
+
+    while (true){
+        Value condVal = condition->evaluate(env, currentGroup);
+
+        if(condVal.getType() == Value::NUMBER && condVal.asNumber() == 0){
+            break;
+        }
+
+        try {
+            result = body->evaluate(env, currentGroup);
+        } catch(const BreakException& e){
+            break;
+        } catch(const ContinueException& e){
+            continue;
+        }
+    }
+}
+
+Value BlockNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
+    Value lastValue;
+    
+    for (const auto& statement : statements) {
+        lastValue = statement->evaluate(env, currentGroup);
+    }
+    
+    return lastValue; 
+}
 // helpers
 std::string resolvePath(std::vector<std::string> scope, std::string currentGroup) {
     std::string targetGroup;
@@ -296,4 +328,4 @@ std::string resolvePath(std::vector<std::string> scope, std::string currentGroup
     }
 
     return targetGroup;
-}
+};
