@@ -5,7 +5,15 @@
 #include <cctype>
 
 enum class TokenType {
+	// Data types
 	Number,
+	String,
+	Group,
+	Function,
+	False,
+	True,
+	Null,
+	// Arithmetic operations
 	Multiply,
 	Add,
 	Substract,
@@ -16,11 +24,6 @@ enum class TokenType {
 	Right_Parenthese,
 	Identifier,
 	Equals,
-	Print,
-	Sizeof,
-	String,
-	Group,
-	Function,
 	Left_CB,
 	Right_CB,
 	Left_Bracket,
@@ -28,9 +31,9 @@ enum class TokenType {
 	Comma,
 	Semicolon,
 	Dot,
-	False,
-	True,
-	Null,
+	// Built-in keywords
+	Print,
+	Sizeof,
 	End
 };
 
