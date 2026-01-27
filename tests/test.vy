@@ -1,8 +1,6 @@
-sub area(r){
-    x = pi * r * r;
-    y = sizeof(x);
-    return y;
-}
+names = {"Tuncay","Qurban","Hossain"};
+group People {
+    x = names;
+};
 
-area = area(5);
-log(area);
+log(People.x);
