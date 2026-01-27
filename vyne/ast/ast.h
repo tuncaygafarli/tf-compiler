@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <stdexcept>
 
+class ASTNode;
 struct Value {
     enum Type { NUMBER, STRING, ARRAY, TABLE, FUNCTION, NONE };
     Type type = NONE;
