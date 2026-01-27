@@ -53,12 +53,17 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 		consume(TokenType::False);
 		return std::make_unique<BooleanNode>(false);
 	}
+
 	// PARSE IDENTIFIERS
 	// x.pos = 5;
 	if (current.type == TokenType::Identifier) {
+		if (current.name == "return" || current.name == "sub" || current.name == "log") {
+        	throw std::runtime_error("Syntax Error : Unexpected keyword '" + current.name + "' in expression");
+    	}	
+
 		std::vector<std::string> scope;
 		Token tok = consume(TokenType::Identifier);
-		
+
 		std::unique_ptr<ASTNode> node = std::make_unique<VariableNode>(tok.name);
 		std::string lastName = tok.name;
 
@@ -147,7 +152,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
 	}
 
 	// parse functions
-		if(current.type == TokenType::Function){
+	if(current.type == TokenType::Function){
 		consume(TokenType::Function);
 		std::string funcName = consume(TokenType::Identifier).name;
 
@@ -222,9 +227,16 @@ std::unique_ptr<ASTNode> Parser::parseExpression() {
 std::unique_ptr<ASTNode> Parser::parseStatement() {
 	Token current = peekToken();
 
+	// return keyword
+	if (current.type == TokenType::Return) {
+        consume(TokenType::Return);
+        auto expr = parseExpression();
+        consume(TokenType::Semicolon);
+        return std::make_unique<ReturnNode>(std::move(expr));
+    }
+
 	// assignment with scope, thanks to ferhad
 	if(current.type == TokenType::Identifier){
-
 		int checkPos = 1;
 
 		while(lookAhead(checkPos).type == TokenType::Dot){

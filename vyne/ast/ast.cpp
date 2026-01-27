@@ -183,6 +183,11 @@ Value FunctionCallNode::evaluate(SymbolContainer& env, std::string currentGroup)
     return result;
 }
 
+Value ReturnNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
+    Value val = expression->evaluate(env, currentGroup);
+    throw ReturnException{val};
+}
+
 Value MethodCallNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     VariableNode* var = dynamic_cast<VariableNode*>(receiver.get());
 

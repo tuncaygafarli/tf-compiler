@@ -92,6 +92,10 @@ struct Value {
     }
 };
 
+struct ReturnException {
+    Value value;
+};
+
 using SymbolTable  = std::unordered_map<std::string, Value>;
 using SymbolContainer = std::unordered_map<std::string, SymbolTable>;
 
@@ -231,6 +235,13 @@ public:
         : funcName(std::move(name)), arguments(std::move(args)) {}
 
     Value evaluate(SymbolContainer& forest, std::string currentGroup) const override;
+};
+
+class ReturnNode : public ASTNode {
+    std::unique_ptr<ASTNode> expression;
+public:
+    ReturnNode(std::unique_ptr<ASTNode> expr) : expression(std::move(expr)) {}
+    Value evaluate(SymbolContainer& env, std::string currentGroup) const override;
 };
 
 class MethodCallNode : public ASTNode {

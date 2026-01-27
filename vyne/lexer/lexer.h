@@ -34,6 +34,7 @@ enum class TokenType {
 	// Built-in keywords
 	Print,
 	Sizeof,
+	Return,
 	End
 };
 

@@ -102,7 +102,14 @@ int main(int argc, char* argv[]) {
 
 				auto root = parser.parseStatement();
 				if (root) {
-					Value result = root->evaluate(forest);
+					Value result;
+					try {
+						result = root->evaluate(forest); 
+					} 
+					catch (const ReturnException& e) {
+						result = e.value; 
+					}
+					
 					result.print(std::cout);
 					std::cout << "\n";
 				}
