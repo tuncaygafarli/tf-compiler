@@ -7,20 +7,27 @@ Value NumberNode::evaluate(SymbolContainer& env, std::string currentGroup) const
 
 Value VariableNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     std::string targetGroup = specificGroup.empty() ? currentGroup : "global";
-    
     if (!specificGroup.empty()) {
         for (const auto& g : specificGroup) targetGroup += "." + g;
     }
 
-    if (env.count(targetGroup) && env[targetGroup].count(name)) {
-        return env[targetGroup][name];
+    auto groupIt = env.find(targetGroup);
+    if (groupIt != env.end()) {
+        auto varIt = groupIt->second.find(name);
+        if (varIt != groupIt->second.end()) {
+            return varIt->second;
+        }
     }
 
-    if (targetGroup != "global" && env["global"].count(name)) {
-        return env["global"][name];
+    if (targetGroup != "global") {
+        auto globalIt = env.find("global");
+        if (globalIt != env.end()) {
+            auto varIt = globalIt->second.find(name);
+            if (varIt != globalIt->second.end()) return varIt->second;
+        }
     }
 
-    throw std::runtime_error("Variable '" + name + "' not found in " + targetGroup + " or global at line " + std::to_string(lineNumber));
+    throw std::runtime_error("Variable '" + name + "' not found.");
 }
 
 Value AssignmentNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
