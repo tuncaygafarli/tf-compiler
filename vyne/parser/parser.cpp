@@ -357,6 +357,19 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 		return node;
 	}
 
+	if (current.type == TokenType::Module) {
+		consume(TokenType::Module);
+		
+		Token nameToken = consume(TokenType::Identifier);
+		std::string moduleName = nameToken.name;
+
+		consumeSemicolon();
+
+		auto node = std::make_unique<ModuleNode>(std::move(moduleName));
+		node->lineNumber = line;
+		return node;
+	}
+
 	auto expr = parseExpression();
     consumeSemicolon(); 
     return expr;

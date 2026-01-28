@@ -8,15 +8,22 @@
 #include <stdexcept>
 #include <variant>
 #include <sstream>
+#include <functional>
 
 #include "../lexer/lexer.h"
 
 class ASTNode;
+struct Value; 
+using SymbolTable = std::unordered_map<std::string, Value>;
+using SymbolContainer = std::unordered_map<std::string, SymbolTable>;
 struct Value {
-    enum TypeIndex { NONE = 0, NUMBER = 1, STRING = 2, ARRAY = 3, TABLE = 4, FUNCTION = 5 };
+    enum TypeIndex { NONE = 0, NUMBER = 1, STRING = 2, ARRAY = 3, TABLE = 4, FUNCTION = 5, MODULE = 6 };
     struct FunctionData {
         std::vector<std::string> params;
         std::vector<std::shared_ptr<ASTNode>> body; 
+
+        std::function<Value(std::vector<Value>&)> nativeFn;
+        bool isNative = false;
     };
 
     using VariantData = std::variant<
@@ -25,7 +32,8 @@ struct Value {
         std::shared_ptr<std::string>,
         std::shared_ptr<std::vector<Value>>,
         std::unordered_map<std::string, Value>,
-        std::shared_ptr<FunctionData>
+        std::shared_ptr<FunctionData>,
+        std::string
     >;
 
     VariantData data;
@@ -44,6 +52,14 @@ struct Value {
         
         data = std::move(func); 
     }
+    Value(std::string moduleName, bool isModule) 
+    : data(std::move(moduleName)) {}
+    Value(std::function<Value(std::vector<Value>&)> native) {
+        auto func = std::make_shared<FunctionData>();
+        func->nativeFn = std::move(native);
+        func->isNative = true;
+        data = std::move(func);
+    }
     Value(const Value&) = default;
 
     // safe getters
@@ -54,6 +70,9 @@ struct Value {
     std::vector<Value>& asList() { return *std::get<std::shared_ptr<std::vector<Value>>>(data); }
     const std::vector<Value>& asList() const { return *std::get<std::shared_ptr<std::vector<Value>>>(data); }
     const std::shared_ptr<FunctionData>& asFunction() const { return std::get<std::shared_ptr<FunctionData>>(data); }
+    const std::string& asModule() const { return std::get<std::string>(data); }
+
+
     bool isTruthy() const {
         switch (data.index()) {
             case 0: return false;
@@ -88,6 +107,9 @@ struct Value {
 
             case 5:
                 os << "<function>";
+                break;
+            case 6:
+                os << "<module '" << std::get<std::string>(data) << "'>";
                 break;
             default:
                 os << "<unknown>";
@@ -174,7 +196,10 @@ struct Value {
                 return false;
         }
     }
+
 };
+
+void setupBuiltIns(SymbolContainer& env);
 
 // exception signals
 struct ReturnException {
@@ -183,9 +208,6 @@ struct ReturnException {
 
 struct BreakException {};
 struct ContinueException {};
-
-using SymbolTable  = std::unordered_map<std::string, Value>;
-using SymbolContainer = std::unordered_map<std::string, SymbolTable>;
 
 class ASTNode {
 public:
@@ -362,6 +384,16 @@ public:
     Value evaluate(SymbolContainer& env, std::string currentGroup) const override;
 };
 
+class ModuleNode : public ASTNode {
+public:
+    std::string moduleName;
+
+    ModuleNode(std::string mName) : moduleName(std::move(mName)) {}
+
+    Value evaluate(SymbolContainer& env, std::string currentGroup) const override;
+};
+
+// exception structs
 struct BreakNode : public ASTNode {
     Value evaluate(SymbolContainer& env, std::string currentGroup) const override {
         throw BreakException();

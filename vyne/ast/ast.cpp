@@ -1,5 +1,13 @@
 #include "ast.h"
 
+void setupBuiltIns(SymbolContainer& env){
+    env["global.vcore"] = SymbolTable(); 
+
+    env["global.vcore"]["sub@now"] = Value([](std::vector<Value>& args) -> Value {
+        return Value(static_cast<double>(time(0)));
+    });
+}
+
 Value NumberNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     return Value(value);
 }
@@ -227,6 +235,28 @@ Value MethodCallNode::evaluate(SymbolContainer& env, std::string currentGroup) c
         std::string targetGroup = resolvePath(var->getScope(), currentGroup);
         Value& target = env[targetGroup][var->getName()];
 
+        // module methods
+        if (target.getType() == Value::MODULE) {
+            std::string modName = target.asModule();
+            std::string modPath = "global." + modName;
+            std::string funcKey = "sub@" + methodName;
+
+            if (env.count(modPath) && env[modPath].count(funcKey)) {
+                Value& funcVal = env[modPath][funcKey];
+                
+                std::vector<Value> argValues;
+                for (auto& arg : arguments) {
+                    argValues.push_back(arg->evaluate(env, currentGroup));
+                }
+
+                if (funcVal.asFunction()->isNative) {
+                    return funcVal.asFunction()->nativeFn(argValues);
+                }
+                
+            }
+            throw std::runtime_error("Module Error: Method '" + methodName + "' not found in module " + modName);
+        }
+
         /*
             Array methods are implemented from here
             Current available methods : size, push, pop, delete, sort, reverse, place_all, clear
@@ -352,6 +382,19 @@ Value BlockNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
     
     return lastValue; 
 }
+
+Value ModuleNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
+    std::string modulePath = "global." + moduleName;
+    
+    if (env.find(modulePath) == env.end()) {
+        env[modulePath] = {}; 
+    }
+
+    env[currentGroup][moduleName] = Value(moduleName, true); 
+    std::cout << "Imported module " << modulePath << "\n";
+    return env[currentGroup][moduleName];
+}
+
 // helpers
 std::string resolvePath(std::vector<std::string> scope, std::string currentGroup) {
     std::string targetGroup;

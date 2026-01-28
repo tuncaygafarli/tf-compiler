@@ -17,9 +17,11 @@
 
 int main(int argc, char* argv[]) {
 	SymbolContainer env;
+	setupBuiltIns(env);
 	env["global"] = {};
 	
 	env["global"]["pi"] = 3.14159;
+
 
 	std::string input;
 

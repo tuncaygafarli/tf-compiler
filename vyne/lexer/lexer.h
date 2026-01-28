@@ -38,6 +38,7 @@ enum class TokenType {
 	Return,
 	Break,
 	Continue,
+	Module,
 	End
 };
 
