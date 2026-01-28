@@ -357,6 +357,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 		return node;
 	}
 
+	// module keyword
 	if (current.type == TokenType::Module) {
 		consume(TokenType::Module);
 		
