@@ -22,8 +22,8 @@ struct Value {
     using VariantData = std::variant<
         std::monostate,
         double,
-        std::string,
-        std::vector<Value>,
+        std::shared_ptr<std::string>,
+        std::shared_ptr<std::vector<Value>>,
         std::unordered_map<std::string, Value>,
         std::shared_ptr<FunctionData>
     >;
@@ -32,8 +32,10 @@ struct Value {
 
     Value() : data(std::monostate{}) {}
     Value(double n) : data(n) {}
-    Value(std::string s) : data(std::move(s)) {}
-    Value(std::vector<Value> l) : data(std::move(l)) {}
+    Value(std::string s) 
+    : data(std::make_shared<std::string>(std::move(s))) {}
+    Value(std::vector<Value> l) 
+    : data(std::make_shared<std::vector<Value>>(std::move(l))) {}
     Value(std::shared_ptr<FunctionData> f) : data(std::move(f)) {}
     Value(std::vector<std::string> p, std::vector<std::shared_ptr<ASTNode>> b) {
         auto func = std::make_shared<FunctionData>();
@@ -48,15 +50,15 @@ struct Value {
     int getType() const { return data.index(); }
 
     double asNumber() const { return std::get<double>(data); }
-    const std::string& asString() const { return std::get<std::string>(data); }
-    std::vector<Value>& asList() { return std::get<std::vector<Value>>(data); }
-    const std::vector<Value>& asList() const { return std::get<std::vector<Value>>(data); }
+    const std::string& asString() const { return *std::get<std::shared_ptr<std::string>>(data); }
+    std::vector<Value>& asList() { return *std::get<std::shared_ptr<std::vector<Value>>>(data); }
+    const std::vector<Value>& asList() const { return *std::get<std::shared_ptr<std::vector<Value>>>(data); }
     const std::shared_ptr<FunctionData>& asFunction() const { return std::get<std::shared_ptr<FunctionData>>(data); }
     bool isTruthy() const {
         switch (data.index()) {
             case 0: return false;
             case 1: return std::get<double>(data) != 0;
-            case 2: return !std::get<std::string>(data).empty();
+            case 2: return !std::get<std::shared_ptr<std::string>>(data)->empty();
             default: return true; 
         }
     }
@@ -70,10 +72,10 @@ struct Value {
                 os << std::get<double>(data);
                 break;
             case 2 :
-                os << "\"" << std::get<std::string>(data) << "\"";
+                os << "\"" << *std::get<std::shared_ptr<std::string>>(data) << "\"";
                 break;
             case 3 : {
-                const auto& list = std::get<std::vector<Value>>(data);
+                const auto& list = *std::get<std::shared_ptr<std::vector<Value>>>(data);
 
                 os << "[";
                 for (size_t i = 0; i < list.size(); ++i) {
@@ -98,11 +100,11 @@ struct Value {
             case 1:
                 return sizeof(double);
             case 2: 
-                return std::get<std::string>(data).length() * sizeof(char);
+                return std::get<std::shared_ptr<std::string>>(data)->length() * sizeof(char);
             case 3: {
                 size_t total = 0;
 
-                const auto& list = std::get<std::vector<Value>>(data);
+                const auto& list = *std::get<std::shared_ptr<std::vector<Value>>>(data);
                 for (const auto& v : list) {
                     total += v.getBytes();
                 }
@@ -135,7 +137,7 @@ struct Value {
                 return s;
             }
             case 2:
-                return std::get<std::string>(data);
+                return *std::get<std::shared_ptr<std::string>>(data);
             case 0: 
                 return "null";
             default: {
@@ -152,8 +154,8 @@ struct Value {
         switch (data.index()) {
             case 0: return true;
             case 1: return std::get<double>(data) == std::get<double>(other.data);
-            case 2: return std::get<std::string>(data) == std::get<std::string>(other.data);
-            case 3: return std::get<std::vector<Value>>(data) == std::get<std::vector<Value>>(other.data);
+            case 2: return *std::get<std::shared_ptr<std::string>>(data) == *std::get<std::shared_ptr<std::string>>(other.data);
+            case 3: return *std::get<std::shared_ptr<std::vector<Value>>>(data) == *std::get<std::shared_ptr<std::vector<Value>>>(other.data);
             default: return false; 
         }
     }
@@ -167,7 +169,7 @@ struct Value {
             case 1:
                 return std::get<double>(data) < std::get<double>(other.data);
             case 2:
-                return std::get<std::string>(data) < std::get<std::string>(other.data);
+                return *std::get<std::shared_ptr<std::string>>(data) < *std::get<std::shared_ptr<std::string>>(other.data);
             default:
                 return false;
         }

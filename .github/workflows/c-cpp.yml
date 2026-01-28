@@ -29,8 +29,8 @@ jobs:
 
       - name: Run Tests
         run: |
-          if [ -f "tests/test.vy" ]; then
-            ./vyne_run tests/test.vy
+          if [ -f "tests/stress_test.vy" ]; then
+            ./vyne_run tests/stress_test.vy
           else
             echo "No test file found, skipping execution check."
           fi
