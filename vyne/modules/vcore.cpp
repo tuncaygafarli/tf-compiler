@@ -51,12 +51,17 @@ namespace VCoreNative {
     }
 
     Value string(std::vector<Value>& args){
-        if (args.size() != 1) throw std::runtime_error("Argument Error : string() expects 1 argument, but got " + std::to_string(args.size()) + " instead.");
+        if (args.size() != 1) throw std::runtime_error("Argument Error : vcore.string() expects 1 argument, but got " + std::to_string(args.size()) + " instead.");
 
         return Value(args[0].toString());
     }
-}
 
+    Value number(std::vector<Value>& args){
+        if (args.size() != 1) throw std::runtime_error("Argument Error : vcore.number() expects 1 argument, but got " + std::to_string(args.size()) + " instead.");
+
+        return Value(args[0].toNumber());
+    }
+}
 
 void setupBuiltIns(SymbolContainer& env) {
     if (env.find("global.vcore") == env.end()) {
@@ -71,6 +76,7 @@ void setupBuiltIns(SymbolContainer& env) {
     vcore["sub@platform"] = Value(VCoreNative::platform);
     vcore["sub@random"]   = Value(VCoreNative::random);
     vcore["sub@string"]   = Value(VCoreNative::string);
+    vcore["sub@number"]   = Value(VCoreNative::number);
 
     // VCore properties
     vcore["version"]      = Value("v0.0.1-alpha").setReadOnly();

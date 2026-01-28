@@ -1,7 +1,6 @@
 module vcore;
 
-os = vcore.platform();
-version = vcore.version;
+num = "2";
+numStr = type(vcore.string(num));
 
-stringTest = vcore.string(2);
-log("Hello from " + os + " " + version + " " + stringTest);
+log(numStr);

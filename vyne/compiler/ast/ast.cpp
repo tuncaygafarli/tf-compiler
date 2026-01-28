@@ -127,7 +127,7 @@ Value BuiltInCallNode::evaluate(SymbolContainer& env, std::string currentGroup) 
     }
 
     else if (funcName == "type") {
-        if (argValues.size() != 1) throw std::runtime_error("Argument Error : string() expects 1 argument, but got " + std::to_string(argValues.size()) + " instead.");
+        if (argValues.size() != 1) throw std::runtime_error("Argument Error : type() expects 1 argument, but got " + std::to_string(argValues.size()) + " instead.");
 
         int type = argValues[0].getType();
 

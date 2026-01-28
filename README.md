@@ -28,3 +28,6 @@ This repository is under maintanance, meaning that current MD file is being used
 5. Groups
    - Defined by `group` keyword, scoping is enabled
 6. While loops
+7. Modules
+   - List of built-in modules
+     - vcore
