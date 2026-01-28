@@ -7,7 +7,7 @@
 #include "vyne/compiler/lexer/lexer.h"
 #include "vyne/compiler/parser/parser.h"
 #include "vyne/compiler/ast/ast.h"
-#include "vyne/modules/vcore.h"
+#include "vyne/modules/modules.h"
 
 #define RESET   "\033[0m"
 #define RED     "\033[31m"

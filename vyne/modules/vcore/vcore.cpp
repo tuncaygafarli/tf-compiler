@@ -63,7 +63,7 @@ namespace VCoreNative {
     }
 }
 
-void setupBuiltIns(SymbolContainer& env) {
+void setupVCore(SymbolContainer& env) {
     if (env.find("global.vcore") == env.end()) {
         env["global.vcore"] = SymbolTable();
     }
