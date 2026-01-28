@@ -61,6 +61,19 @@ namespace VCoreNative {
 
         return Value(args[0].toNumber());
     }
+
+    Value input(std::vector<Value>& args){
+        if(!args.empty() && args[0].getType() == 2){
+            std::cout << args[0].asString();
+        }
+
+        std::string input;
+        if(std::getline(std::cin, input)){
+            return Value(input);
+        }
+
+        return Value();
+    }
 }
 
 void setupVCore(SymbolContainer& env) {
@@ -77,6 +90,7 @@ void setupVCore(SymbolContainer& env) {
     vcore["sub@random"]   = Value(VCoreNative::random);
     vcore["sub@string"]   = Value(VCoreNative::string);
     vcore["sub@number"]   = Value(VCoreNative::number);
+    vcore["sub@input"]    = Value(VCoreNative::input);
 
     // VCore properties
     vcore["version"]      = Value("v0.0.1-alpha").setReadOnly();
