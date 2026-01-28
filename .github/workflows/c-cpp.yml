@@ -31,10 +31,13 @@ jobs:
         run: |
           if [ -f "tests/stress_test.vy" ]; then
             ./vyne_run tests/stress_test.vy
+          fi
           if [ -f "tests/while_test.vy" ]; then
             ./vyne_run tests/while_test.vy
+          fi
           if [ -f "tests/array_test.vy" ]; then
             ./vyne_run tests/array_test.vy
+          fi
           if [ -f "tests/module_test.vy" ]; then
             ./vyne_run tests/module_test.vy
           else
