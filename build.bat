@@ -16,12 +16,14 @@ if %ERRORLEVEL% EQU 0 (
     echo Build Successful: %OUT% created.
     
     if "%1"=="--test" (
-        echo Running module_test.vy...
-        .\%OUT% tests/module_test.vy
+        if not "%2"=="" (
+            echo 🏃 Running tests/%2_test.vy...
+            .\%OUT% tests/%2_test.vy
+        ) else (
+            echo 🏃 Running default stress_test.vy...
+            .\%OUT% tests/stress_test.vy
+        )
     )
-) else (
-    echo Build Failed! Check the errors above.
-    exit /b 1
 )
 
 endlocal

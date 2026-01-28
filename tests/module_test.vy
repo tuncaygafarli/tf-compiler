@@ -1,3 +1,4 @@
 module vcore;
 
-log(vcore.now());
+os = vcore.platform();
+log("Hello from " + os);
