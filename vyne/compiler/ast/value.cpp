@@ -28,10 +28,10 @@ void Value::print(std::ostream& os) const {
             break;
         }
 
-        case 5:
+        case 4:
             os << "<function>";
             break;
-        case 6:
+        case 5:
             os << "<module '" << *std::get<std::shared_ptr<std::string>>(data) << "'>";
             break;
         default:
