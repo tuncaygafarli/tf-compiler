@@ -1,0 +1,27 @@
+PROJECT_NAME           = "Vyne"
+PROJECT_BRIEF          = "An interpreted programming language with a focus on ASCII graphics."
+OUTPUT_DIRECTORY       = docs
+CREATE_SUBDIRS         = NO
+OUTPUT_LANGUAGE        = English
+
+INPUT                  = vyne/
+RECURSIVE              = YES
+FILE_PATTERNS          = *.cpp *.h *.hpp *.vy
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+SORT_MEMBER_DOCS       = YES
+
+BUILTIN_STL_SUPPORT    = YES
+TAB_SIZE               = 4
+
+HAVE_DOT               = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+GROUP_GRAPHS           = YES
+TEMPLATE_RELATIONS     = YES
+CALL_GRAPH             = YES  
+CALLER_GRAPH           = YES
+
+DOT_PATH               =

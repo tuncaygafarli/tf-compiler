@@ -29,6 +29,13 @@ Value VariableNode::evaluate(SymbolContainer& env, std::string currentGroup) con
     throw std::runtime_error("Runtime Error: Variable ID '" + std::to_string(nameId) + "' not found.");
 }
 
+/**
+ * @brief Handles variable assignment and updates the SymbolContainer.
+ * * @note Throws a runtime_error if attempting to reassign a Read-Only value.
+ * @see VariableNode::evaluate
+ * * @return Value The value being assigned (allows for chained assignments like a = b = 1).
+ */
+
 Value AssignmentNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     Value val = rhs->evaluate(env, currentGroup);
     std::string targetGroup = resolvePath(scopePath, currentGroup);
@@ -299,6 +306,14 @@ Value MethodCallNode::evaluate(SymbolContainer& env, std::string currentGroup) c
     throw std::runtime_error("Unknown method: " + methodName);
 }
 
+/**
+ * @brief Executes a block of code repeatedly while a condition is truthy.
+ * * This implementation supports:
+ * - @b Break: Caught via BreakException to exit the loop.
+ * - @b Continue: Caught via ContinueException to skip to the next iteration.
+ * * 
+ */
+
 Value WhileNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     Value lastResult;
     while (condition->evaluate(env, currentGroup).isTruthy()) {
@@ -322,6 +337,15 @@ Value BlockNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
     for (const auto& statement : statements) lastValue = statement->evaluate(env, currentGroup);
     return lastValue; 
 }
+
+/**
+ * @brief Registers and initializes external modules within the current scope.
+ * * When a `module` keyword is encountered, this node triggers the setup functions 
+ * for native libraries (like vcore or vglib).
+ * * @param env The global symbol container mapping scope paths to symbol tables.
+ * @param currentGroup The current hierarchical scope path (e.g., "global.main").
+ * @return Value The Module-typed value representing the loaded library.
+ */
 
 Value ModuleNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     if (originalName == "vcore") {
