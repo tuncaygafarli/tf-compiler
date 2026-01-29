@@ -40,7 +40,7 @@ public:
     Token consume(TokenType expected);
     void consumeSemicolon();
 
-	Parser(std::vector<Token> t) : tokens(t) {};
+	Parser(std::vector<Token> t) : tokens(std::move(t)) {};
 
 	std::unique_ptr<ASTNode> parseFunctionDefinition();
 	std::unique_ptr<ASTNode> parseBuiltInCall();
