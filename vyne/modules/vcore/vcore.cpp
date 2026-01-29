@@ -85,6 +85,8 @@ void setupVCore(SymbolContainer& env, StringPool& pool) {
 
     auto& vcore = env[path];
 
+
+    // VCore methods
     vcore[pool.intern("now")]      = Value(VCoreNative::now);
     vcore[pool.intern("sleep")]    = Value(VCoreNative::sleep);
     vcore[pool.intern("platform")] = Value(VCoreNative::platform);
@@ -93,5 +95,6 @@ void setupVCore(SymbolContainer& env, StringPool& pool) {
     vcore[pool.intern("number")]   = Value(VCoreNative::number);
     vcore[pool.intern("input")]    = Value(VCoreNative::input);
 
+    // VCore properties
     vcore[pool.intern("version")]  = Value("v0.0.1-alpha").setReadOnly();
 }
