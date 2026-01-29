@@ -57,6 +57,19 @@ namespace VCoreNative {
         return Value(args[0].toNumber());
     }
 
+    /**
+     * @brief Reads a line of text from the standard input (stdin).
+     * * This native function pauses script execution and waits for the user to press Enter.
+     * It can optionally take a single string argument to display as a prompt before 
+     * reading input.
+     * * @param args A vector containing:
+     * - args[0] (Optional): A string prompt to display to the user.
+     * * @return Value A string containing the user's input. Returns a Null value if
+     * input stream fails or reaches end-of-file (EOF).
+     * * @note If a non-string argument is provided as the first parameter, it is 
+     * ignored and no prompt is displayed.
+     */
+
     Value input(std::vector<Value>& args){
         if(!args.empty() && args[0].getType() == Value::STRING){
             std::cout << args[0].asString();
@@ -68,6 +81,36 @@ namespace VCoreNative {
         }
 
         return Value();
+    }
+
+    /**
+     * @brief Constrains a numeric value between a minimum and maximum range.
+     * * This native function takes three arguments: the value to clamp, the lower bound,
+     * and the upper bound. If the value is less than the minimum, the minimum is returned.
+     * If the value is greater than the maximum, the maximum is returned.
+     * * @param args A vector containing:
+     * - args[0]: The input value (Number)
+     * - args[1]: The lower bound (Number)
+     * - args[2]: The upper bound (Number)
+     * * @throw std::runtime_error If the number of arguments is not exactly 3.
+     * @return Value The clamped numeric result.
+     */
+
+    Value clamp(std::vector<Value>& args) {
+        if (args.size() != 3) {
+            throw std::runtime_error("Argument Error: vcore.clamp() expects 3 arguments (val, min, max), but got " + std::to_string(args.size()) + ".");
+        }
+
+        double val = args[0].asNumber();
+        double min = args[1].asNumber();
+        double max = args[2].asNumber();
+
+        if (min > max) std::swap(min, max);
+
+        if (val < min) return Value(min);
+        if (val > max) return Value(max);
+        
+        return Value(val);
     }
 }
 
@@ -89,6 +132,7 @@ void setupVCore(SymbolContainer& env, StringPool& pool) {
     vcore[pool.intern("string")]   = Value(VCoreNative::string);
     vcore[pool.intern("number")]   = Value(VCoreNative::number);
     vcore[pool.intern("input")]    = Value(VCoreNative::input);
+    vcore[pool.intern("clamp")]     = Value(VCoreNative::clamp);
 
     // VCore properties
     vcore[pool.intern("version")]  = Value("v0.0.1-alpha").setReadOnly();
