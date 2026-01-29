@@ -61,6 +61,17 @@ Value GroupNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
 
 Value BinOpNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     Value l = left->evaluate(env, currentGroup);
+
+    if (op == TokenType::And) {
+        if (l.asNumber() == 0) return Value(0.0);
+        return Value(right->evaluate(env, currentGroup).asNumber() != 0 ? 1.0 : 0.0);
+    }
+    
+    if (op == TokenType::Or) {
+        if (l.asNumber() != 0) return Value(1.0);
+        return Value(right->evaluate(env, currentGroup).asNumber() != 0 ? 1.0 : 0.0);
+    }
+
     Value r = right->evaluate(env, currentGroup);
 
     if (l.getType() == Value::STRING && r.getType() == Value::STRING) {
@@ -86,13 +97,6 @@ Value BinOpNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
         case TokenType::Smaller: return Value(l.asNumber() < r.asNumber());
         case TokenType::Greater: return Value(l.asNumber() > r.asNumber());
         case TokenType::Double_Equals: return Value(l == r);
-        case TokenType::And: {
-            if (l.asNumber() == 0) { 
-                return Value(0);
-            }
-            
-            return Value(r.asNumber() != 0 ? 1 : 0);
-        }
         default: return Value(0.0);
     }
 }

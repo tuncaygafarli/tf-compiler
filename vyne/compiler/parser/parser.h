@@ -22,7 +22,8 @@ public:
 	std::unique_ptr<ASTNode> parseFactor();
 	std::unique_ptr<ASTNode> parseTerm();
 	std::unique_ptr<ASTNode> parseRelational();
-	std::unique_ptr<ASTNode> parseAnd();
+	std::unique_ptr<ASTNode> parseLogicalOr();
+	std::unique_ptr<ASTNode> parseLogicalAnd();
 	std::unique_ptr<ASTNode> parseEquality();
 	std::unique_ptr<ASTNode> parseExpression();
 	std::unique_ptr<ASTNode> parseStatement();

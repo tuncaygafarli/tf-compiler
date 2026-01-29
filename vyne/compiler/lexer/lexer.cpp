@@ -128,6 +128,13 @@ std::vector<Token> tokenize(const std::string& input) {
                 }
                 break;
             }
+            case '|' : {
+                if(i + 1 < input.length() && input[i + 1] == '|'){
+                    tokens.emplace_back(TokenType::Or, currentLine, 0, "::");
+                    i++;
+                }
+                break;
+            }
             default:
                 std::cerr << "Unexpected character: " << character << std::endl;
                 break;
