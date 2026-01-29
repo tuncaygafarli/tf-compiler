@@ -1,5 +1,10 @@
+list = [];
 i = 0;
 
-while (i < 10000){
+while (i < 1000) {
+    list.push(i);
     i = i + 1;
 }
+
+log("Array size:");
+log(list.size());
