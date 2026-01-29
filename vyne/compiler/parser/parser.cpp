@@ -73,13 +73,11 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
         std::vector<std::string> scope;
         Token tok = consume(TokenType::Identifier);
         
-        // Intern the identifier immediately
         uint32_t currentId = StringPool::instance().intern(tok.name);
         std::string lastName = tok.name;
 
         std::unique_ptr<ASTNode> node;
 
-        // Check for immediate Function Call: func()
         if (peekToken().type == TokenType::Left_Parenthese) {
             consume(TokenType::Left_Parenthese);
             std::vector<std::unique_ptr<ASTNode>> args;
@@ -96,7 +94,6 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
             node = std::make_unique<VariableNode>(currentId);
         }
 
-        // Handle property access (.member) or indexing ([idx])
         while (peekToken().type == TokenType::Dot || peekToken().type == TokenType::Left_Bracket) {
             if (peekToken().type == TokenType::Dot) {
                 consume(TokenType::Dot);
@@ -116,19 +113,16 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
                     consume(TokenType::Right_Parenthese);
                     node = std::make_unique<MethodCallNode>(std::move(node), member.name, std::move(args));
                 } else {
-                    // Nested variable: scope.lastName
                     scope.emplace_back(lastName);
                     lastName = member.name;
                     uint32_t memberId = StringPool::instance().intern(member.name);
                     node = std::make_unique<VariableNode>(memberId, std::move(scope));
                 }
             } else if (peekToken().type == TokenType::Left_Bracket) {
-                // Index access: receiver[index]
                 consume(TokenType::Left_Bracket);
                 auto indexExpr = parseExpression();
                 consume(TokenType::Right_Bracket);
                 
-                // We use the ID of the last identified name for index access
                 uint32_t lastId = StringPool::instance().intern(lastName);
                 node = std::make_unique<IndexAccessNode>(lastId, lastName, scope, std::move(indexExpr));
             }
