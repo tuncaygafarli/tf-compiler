@@ -84,6 +84,31 @@ InterpretResult VM::run() {
                 }
                 break;
             }
+            case OP_JUMP_IF_FALSE : {
+                uint16_t offset = static_cast<uint16_t>((ip[0] << 8) | ip[1]);
+
+                Value condition = pop();
+                if(!condition.isTruthy()){
+                    ip += offset;
+                }
+                break;
+            }
+            case OP_EQUAL : {
+                Value b = pop();
+                Value a = pop();
+                push(Value(a == b));
+                break;
+            }
+            case OP_POP : {
+                stack.pop_back();
+                break;
+            }
+            case OP_PRINT : {
+                Value val = pop();
+                val.print(std::cout);
+                std::cout << "\n";
+                break;
+            }
             case OP_RETURN: {
                 Value finalResult = pop();
                 std::cout << "Result: ";

@@ -22,6 +22,7 @@ void BinOpNode::compile(Emitter& e) const {
         case VTokenType::Substract:  e.emitByte(OP_SUBTRACT); break;
         case VTokenType::Multiply:   e.emitByte(OP_MULTIPLY); break;
         case VTokenType::Division:  e.emitByte(OP_DIVIDE); break;
+        case VTokenType::Double_Equals : e.emitByte(OP_EQUAL); break;
         default: break;
     }
 }
@@ -64,7 +65,15 @@ void AssignmentNode::compile(Emitter& e) const {
     e.emitBytes(OP_DEFINE_GLOBAL, (uint8_t)nameIndex);
 }
 
-void BuiltInCallNode::compile(Emitter& e) const {}
+void BuiltInCallNode::compile(Emitter& e) const {
+    for (const auto& arg : arguments) {
+        arg->compile(e);
+    }
+
+    if (funcName == "log") {
+        e.emitByte(OP_PRINT);
+    }
+}
 void ArrayNode::compile(Emitter& e) const {}
 void IndexAccessNode::compile(Emitter& e) const {}
 void FunctionNode::compile(Emitter& e) const {}
@@ -78,7 +87,14 @@ void BlockNode::compile(Emitter& e) const {
 }
 void ModuleNode::compile(Emitter& e) const {}
 void DismissNode::compile(Emitter& e) const {}
-void IfNode::compile(Emitter& e) const {}
+void IfNode::compile(Emitter& e) const {
+    condition->compile(e); 
+    int jumpAddress = e.emitJump(OP_JUMP_IF_FALSE);
+
+    if (body) body->compile(e);
+
+    e.patchJump(jumpAddress);
+}
 void BreakNode::compile(Emitter& e) const {}
 void ContinueNode::compile(Emitter& e) const {}
 
