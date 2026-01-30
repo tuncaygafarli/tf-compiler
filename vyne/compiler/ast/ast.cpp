@@ -56,10 +56,34 @@ Value VariableNode::evaluate(SymbolContainer& env, std::string currentGroup) con
 Value AssignmentNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     Value val = rhs->evaluate(env, currentGroup);
     std::string targetGroup = resolvePath(scopePath, currentGroup);
+    auto& table = env[targetGroup];
 
-    auto& table = env[targetGroup]; 
+    if (indexExpr) {
+        auto it = table.find(identifierId);
+        if (it == table.end()) {
+            throw std::runtime_error("Runtime Error: Array '" + originalName + "' not found.");
+        }
+
+        Value& arrayVal = it->second; 
+        
+        if (arrayVal.getType() != Value::ARRAY) {
+            throw std::runtime_error("Runtime Error: Cannot index into non-array '" + originalName + "'");
+        }
+
+        Value idxValue = indexExpr->evaluate(env, currentGroup);
+        size_t idx = static_cast<size_t>(idxValue.asNumber());
+
+        auto& vec = arrayVal.asList();
+        if (idx < vec.size()) {
+            vec[idx] = val;
+        } else {
+            throw std::runtime_error("Runtime Error: Index out of bounds.");
+        }
+        
+        return val;
+    }
+
     auto it = table.find(identifierId);
-    
     if (it != table.end() && it->second.isReadOnly) {
         throw std::runtime_error("Runtime Error: Cannot reassign read-only '" + originalName + "'");
     }

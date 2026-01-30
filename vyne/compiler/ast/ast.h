@@ -82,11 +82,23 @@ class AssignmentNode : public ASTNode {
     uint32_t identifierId;
     std::string originalName;
     std::unique_ptr<ASTNode> rhs;
+    std::unique_ptr<ASTNode> indexExpr; // The [j] part
     std::vector<std::string> scopePath;
+
 public:
-    AssignmentNode(uint32_t id, std::string on,std::unique_ptr<ASTNode> rhs_ptr, std::vector<std::string> path = {})
-        : identifierId(id), originalName(std::move(on)), rhs(std::move(rhs_ptr)), scopePath(std::move(path)) {
+    // Added idx_ptr to the arguments list
+    AssignmentNode(uint32_t id, 
+                   std::string on, 
+                   std::unique_ptr<ASTNode> rhs_ptr, 
+                   std::unique_ptr<ASTNode> idx_ptr = nullptr,
+                   std::vector<std::string> path = {})
+        : identifierId(id), 
+          originalName(std::move(on)), 
+          rhs(std::move(rhs_ptr)), 
+          indexExpr(std::move(idx_ptr)),
+          scopePath(std::move(path)) {
     }
+
     Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
 };
 

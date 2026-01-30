@@ -272,23 +272,23 @@ std::unique_ptr<ASTNode> Parser::parseWhileLoop() {
 
 std::unique_ptr<ASTNode> Parser::parseAssignment() {
     int line = peekToken().line;
-    std::vector<std::string> path;
+    
+    Token varTok = consume(VTokenType::Identifier);
+    uint32_t varId = StringPool::instance().intern(varTok.name);
+    
+    std::unique_ptr<ASTNode> indexExpr = nullptr;
 
-    path.emplace_back(consume(VTokenType::Identifier).name);
-    while (peekToken().type == VTokenType::Dot) {
-        consume(VTokenType::Dot);
-        path.emplace_back(consume(VTokenType::Identifier).name);
+    if (peekToken().type == VTokenType::Left_Bracket) {
+        consume(VTokenType::Left_Bracket);
+        indexExpr = parseExpression();
+        consume(VTokenType::Right_Bracket);
     }
-
-    std::string varName = path.back();
-    uint32_t varId = StringPool::instance().intern(varName);
-    path.pop_back();
 
     consume(VTokenType::Equals);
     auto rhs = parseExpression();
     consumeSemicolon();
 
-    auto node = std::make_unique<AssignmentNode>(varId, varName, std::move(rhs), path);
+    auto node = std::make_unique<AssignmentNode>(varId, varTok.name, std::move(rhs), std::move(indexExpr));
     node->lineNumber = line;
     return node;
 }
@@ -464,10 +464,24 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
         case VTokenType::Dismiss:    return parseDismissStatement();
         case VTokenType::Identifier: {
             int checkPos = 1;
-            while(lookAhead(checkPos).type == VTokenType::Dot) checkPos += 2;
+            while(lookAhead(checkPos).type == VTokenType::Dot || 
+                lookAhead(checkPos).type == VTokenType::Left_Bracket) {
+                
+                if (lookAhead(checkPos).type == VTokenType::Left_Bracket) {
+                    int bracketDepth = 1;
+                    checkPos++;
+                    while (bracketDepth > 0 && lookAhead(checkPos).type != VTokenType::End) {
+                        if (lookAhead(checkPos).type == VTokenType::Left_Bracket) bracketDepth++;
+                        if (lookAhead(checkPos).type == VTokenType::Right_Bracket) bracketDepth--;
+                        checkPos++;
+                    }
+                } else {
+                    checkPos += 2;
+                }
+            }
             
             if(lookAhead(checkPos).type == VTokenType::Equals) {
-                return parseAssignment();
+                return parseAssignment(); 
             }
             
             auto expr = parseExpression();
