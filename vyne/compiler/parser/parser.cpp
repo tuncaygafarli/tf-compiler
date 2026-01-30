@@ -515,9 +515,12 @@ Token Parser::consume(VTokenType expected) {
 }
 
 void Parser::consumeSemicolon() {
-    if (peekToken().type == VTokenType::Semicolon) {
+    Token t = peekToken();
+    if (t.type == VTokenType::Semicolon) {
         consume(VTokenType::Semicolon);
-    } else if (peekToken().type != VTokenType::End) {
-        throw std::runtime_error("Expected ';' at end of statement.");
+    } else if (t.type != VTokenType::End && t.type != VTokenType::Right_CB) {
+        throw std::runtime_error("Runtime/Compilation Error: Expected ';' at end of statement on line " 
+            + std::to_string(t.line) + 
+            ", but got '" + t.name + "' instead.");
     }
 }
