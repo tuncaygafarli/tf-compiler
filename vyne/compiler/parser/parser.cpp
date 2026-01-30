@@ -113,12 +113,19 @@ std::unique_ptr<ASTNode> Parser::parseFunctionDefinition() {
         if (peekToken().type == VTokenType::Extends) {
             consume(VTokenType::Extends);
             targetModule = firstTok.name;
+
             Token actualFuncTok = consume(VTokenType::Identifier);
             funcName = actualFuncTok.name;
+
         } else {
             funcName = firstTok.name;
         }
     }
+       
+    if(targetModule == "vcore" || targetModule == "vglib"){
+        throw std::runtime_error("Permission Error : Cannot inject function '" + funcName + "' to built-in module " + targetModule + " at line " + std::to_string(line));
+    }
+    
     funcId = StringPool::instance().intern(funcName);
 
     consume(VTokenType::Left_Parenthese);
@@ -375,7 +382,6 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
         case VTokenType::False:                   return parseBooleanLiteral();
         case VTokenType::Identifier:              return parseIdentifierExpr();
         case VTokenType::Left_Bracket:            return parseArrayLiteral();
-        case VTokenType::Function:                return parseFunctionDefinition();
         case VTokenType::Left_Parenthese:         return parseGroupingExpr();
         case VTokenType::BuiltIn:                 return parseBuiltInCall();
         default:
@@ -453,6 +459,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
     Token current = peekToken();
     
     switch (current.type) {
+        case VTokenType::Function:   return parseFunctionDefinition();
         case VTokenType::Left_CB:    return parseBlock();
         case VTokenType::Return:     return parseReturnStatement();
         case VTokenType::If:         return parseIfStatement();
