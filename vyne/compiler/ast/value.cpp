@@ -55,6 +55,15 @@ size_t Value::getDeepBytes() const {
         }
         
         // TODO HANDLE FUNCTIONS AND MODULES
+        case 4 : {
+            auto func = std::get<std::shared_ptr<FunctionData>>(data);
+            if (!func) return 0;
+            size_t total = sizeof(FunctionData);
+
+            total += func->params.capacity() * sizeof(uint32_t);
+            total += func->body.capacity() * sizeof(std::shared_ptr<ASTNode>);
+            return total;
+        }
         default: return 0;
     }
 }
