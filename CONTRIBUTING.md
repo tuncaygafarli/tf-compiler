@@ -6,7 +6,7 @@ Thank you for your interest in contributing to the Vyne Interpreter! We aim for 
 
 ## 🏗 Architecture Principles
 
-To keep the "vine" from getting tangled, please follow these guidelines:
+To keep the "Vyne" from getting tangled, please follow these guidelines:
 
 - **Recursive Descent:** Every grammar rule should have its own "worker" function (e.g., `parseWhileLoop`). Avoid massive `if-else` chains.
 - **Move Semantics:** Use `std::move` when passing large objects like `std::vector<Token>` or `std::unique_ptr<ASTNode>` to prevent expensive copies.
