@@ -79,18 +79,6 @@ namespace VCoreNative {
         return Value(static_cast<double>(dist(gen)));
     }
 
-    Value string(std::vector<Value>& args){
-        if (args.size() != 1) throw std::runtime_error("Argument Error : vcore.string() expects 1 argument, but got " + std::to_string(args.size()) + " instead.");
-
-        return Value(args[0].toString());
-    }
-
-    Value number(std::vector<Value>& args){
-        if (args.size() != 1) throw std::runtime_error("Argument Error : vcore.number() expects 1 argument, but got " + std::to_string(args.size()) + " instead.");
-
-        return Value(args[0].toNumber());
-    }
-
     /**
      * @brief Reads a line of text from the standard input (stdin).
      * * This native function pauses script execution and waits for the user to press Enter.
@@ -163,8 +151,6 @@ void setupVCore(SymbolContainer& env, StringPool& pool) {
     vcore[pool.intern("sleep")]           = Value(VCoreNative::sleep);
     vcore[pool.intern("platform")]        = Value(VCoreNative::platform);
     vcore[pool.intern("random")]          = Value(VCoreNative::random);
-    vcore[pool.intern("string")]          = Value(VCoreNative::string);
-    vcore[pool.intern("number")]          = Value(VCoreNative::number);
     vcore[pool.intern("input")]           = Value(VCoreNative::input);
     vcore[pool.intern("clamp")]           = Value(VCoreNative::clamp);
 

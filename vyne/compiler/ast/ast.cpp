@@ -166,6 +166,27 @@ Value BuiltInCallNode::evaluate(SymbolContainer& env, std::string currentGroup) 
             default: return Value("unknown");
         }
     }
+
+    if(funcName == "string"){
+        if(argValues.size() != 1) throw std::runtime_error("Argument Error : string() expects 1 arguments, but got " + std::to_string(argValues.size()) + " instead at line " + std::to_string(lineNumber));
+        if(argValues[0].getType() != Value::NUMBER) throw std::runtime_error("Argument Error : string() only takes Number type as argument [ line " + std::to_string(lineNumber) + " ]");
+
+        return Value(argValues[0].toString());
+    } 
+
+    if(funcName == "number"){
+        if(argValues.size() != 1) throw std::runtime_error("Argument Error : number() expects 1 arguments, but got " + std::to_string(argValues.size()) + " instead at line " + std::to_string(lineNumber));
+        if(argValues[0].getType() != Value::STRING) throw std::runtime_error("Argument Error : number() only takes String type as argument [ line " + std::to_string(lineNumber) + " ]");
+
+        return Value(argValues[0].toNumber());
+    } 
+
+    if(funcName == "sizeof"){
+        if(argValues.size() != 1) throw std::runtime_error("Argument Error : sizeof() expects 1 arguments, but got " + std::to_string(argValues.size()) + " instead at line " + std::to_string(lineNumber));
+
+        return Value(argValues[0].getBytes());
+    } 
+
     throw std::runtime_error("Unknown built-in: " + funcName);
 }
 
