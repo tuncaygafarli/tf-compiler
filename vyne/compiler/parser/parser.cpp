@@ -8,6 +8,8 @@
 #define CYAN    "\033[36m"
 #define BOLD    "\033[1m"
 
+// TODO ADD DOUBLE INCREMENT SYNTAX
+
 Token Parser::getNextToken() {
     if (pos < tokens.size()) {
         return tokens[pos++];

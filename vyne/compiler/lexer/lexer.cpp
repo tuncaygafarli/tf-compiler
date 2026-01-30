@@ -87,7 +87,6 @@ std::vector<Token> tokenize(const std::string& input) {
         }
 
         switch (character) {
-            case '+': tokens.emplace_back(VTokenType::Add, currentLine, 0, "+"); break;
             case '*': tokens.emplace_back(VTokenType::Multiply, currentLine, 0, "*"); break;
             case '/': tokens.emplace_back(VTokenType::Division, currentLine, 0, "/"); break;
             case '(': tokens.emplace_back(VTokenType::Left_Parenthese, currentLine, 0, "("); break;
@@ -99,6 +98,15 @@ std::vector<Token> tokenize(const std::string& input) {
             case ',': tokens.emplace_back(VTokenType::Comma, currentLine, 0, ","); break;
             case ';': tokens.emplace_back(VTokenType::Semicolon, currentLine, 0, ":"); break;
             case '.': tokens.emplace_back(VTokenType::Dot, currentLine, 0, "."); break;
+            case '+': {
+                if (i + 1 < input.length() && input[i + 1] == '+') {
+                    tokens.emplace_back(VTokenType::Double_Increment, currentLine, 0, "++");
+                    i++;
+                } else {
+                    tokens.emplace_back(VTokenType::Add, currentLine, 0, "+");
+                }
+                break;
+            }
             case '<': {
                 if (i + 1 < input.length() && input[i + 1] == '=') {
                     tokens.emplace_back(VTokenType::Smaller_Or_Equal, currentLine, 0, "<=");
