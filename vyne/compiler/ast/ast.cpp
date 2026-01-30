@@ -215,6 +215,28 @@ Value ReturnNode::evaluate(SymbolContainer& env, std::string currentGroup) const
     throw ReturnException{expression->evaluate(env, currentGroup)};
 }
 
+/**
+ * @brief Dispatches and executes method calls on a receiver object.
+ * * @details This method serves as the central hub for "Dot Notation" syntax. 
+ * It supports two primary execution paths:
+ * * 1. **Module Calls:** When the receiver evaluates to a MODULE, it searches 
+ * the module's namespace for a matching FUNCTION (Native or Vyne-defined).
+ * * 2. **Built-in Array Methods:** When the receiver is an ARRAY, it provides 
+ * access to the built-in standard library, including:
+ * - `size()`: Returns element count.
+ * - `push(val)`: Appends elements to the array.
+ * - `pop()`: Removes the last element.
+ * - `delete(val)`: Erases a specific value.
+ * - `sort()`, `reverse()`, `clear()`, `place_all(val, count)`.
+ * * @note Array methods require the receiver to be a named variable (L-Value) 
+ * to allow for in-place modification.
+ * * @param env The current SymbolContainer holding global and scoped variables.
+ * @param currentGroup The active namespace/group context of the caller.
+ * * @throw std::runtime_error If the method is unknown, the module is missing, 
+ * or if type/argument constraints are violated.
+ * * @return Value The result of the function execution or the modified receiver object.
+ */
+
 Value MethodCallNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     Value receiverVal = receiver->evaluate(env, currentGroup);
     uint32_t methodId = StringPool::instance().intern(methodName);
