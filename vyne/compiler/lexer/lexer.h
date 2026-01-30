@@ -4,7 +4,7 @@
 #include <string>
 #include <cctype>
 
-enum class TokenType {
+enum class VTokenType {
 	// Data types
 	Number,
 	String,
@@ -49,18 +49,18 @@ enum class TokenType {
 };
 
 struct Token {
-    TokenType type;
+    VTokenType type;
     double value;
     std::string name;
     int line;
 
-    Token(TokenType t, int cl, double v = 0.0, std::string n = "")
+    Token(VTokenType t, int cl, double v = 0.0, std::string n = "")
         : type(t), value(v), name(n), line(cl) {
     }
 
-    Token() : type(TokenType::End), value(0.0), name(""), line(0) {}
+    Token() : type(VTokenType::End), value(0.0), name(""), line(0) {}
 };
 
 std::vector<Token> tokenize(const std::string& input);
-std::string tokenTypeToString(TokenType type);
+std::string VTokenTypeToString(VTokenType type);
 char advance();

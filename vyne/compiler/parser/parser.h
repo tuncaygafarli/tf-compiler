@@ -41,7 +41,7 @@ public:
     Token peekToken();
 	Token getNextToken();
     Token lookAhead(int distance);
-    Token consume(TokenType expected);
+    Token consume(VTokenType expected);
     void  consumeSemicolon();
 
 	Parser(std::vector<Token> t) : tokens(std::move(t)) {};

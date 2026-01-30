@@ -91,11 +91,11 @@ public:
 };
 
 class BinOpNode : public ASTNode {
-    TokenType op;
+    VTokenType op;
     std::unique_ptr<ASTNode> left;
     std::unique_ptr<ASTNode> right;
 public:
-    BinOpNode(TokenType op, std::unique_ptr<ASTNode> l, std::unique_ptr<ASTNode> r)
+    BinOpNode(VTokenType op, std::unique_ptr<ASTNode> l, std::unique_ptr<ASTNode> r)
         : op(op), left(std::move(l)), right(std::move(r)) {
     }
     Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;

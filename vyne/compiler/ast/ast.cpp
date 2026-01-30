@@ -79,12 +79,12 @@ Value GroupNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
 Value BinOpNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     Value l = left->evaluate(env, currentGroup);
 
-    if (op == TokenType::And) {
+    if (op == VTokenType::And) {
         if (l.asNumber() == 0) return Value(0.0);
         return Value(right->evaluate(env, currentGroup).asNumber() != 0 ? 1.0 : 0.0);
     }
     
-    if (op == TokenType::Or) {
+    if (op == VTokenType::Or) {
         if (l.asNumber() != 0) return Value(1.0);
         return Value(right->evaluate(env, currentGroup).asNumber() != 0 ? 1.0 : 0.0);
     }
@@ -92,12 +92,12 @@ Value BinOpNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
     Value r = right->evaluate(env, currentGroup);
 
     if (l.getType() == Value::STRING && r.getType() == Value::STRING) {
-        if (op == TokenType::Add) return Value(l.asString() + r.asString());
+        if (op == VTokenType::Add) return Value(l.asString() + r.asString());
         throw std::runtime_error("Type Error: Only '+' allowed for strings.");
     }
 
     if (l.getType() == Value::ARRAY && r.getType() == Value::ARRAY) {
-        if (op == TokenType::Add) {
+        if (op == VTokenType::Add) {
             Value result = l;
             result.asList().insert(result.asList().end(), r.asList().begin(), r.asList().end());
             return result;
@@ -105,15 +105,15 @@ Value BinOpNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
     }
 
     switch (op) {
-        case TokenType::Add: return Value(l.asNumber() + r.asNumber());
-        case TokenType::Substract: return Value(l.asNumber() - r.asNumber());
-        case TokenType::Multiply: return Value(l.asNumber() * r.asNumber());
-        case TokenType::Division:
+        case VTokenType::Add: return Value(l.asNumber() + r.asNumber());
+        case VTokenType::Substract: return Value(l.asNumber() - r.asNumber());
+        case VTokenType::Multiply: return Value(l.asNumber() * r.asNumber());
+        case VTokenType::Division:
             if (r.asNumber() == 0) throw std::runtime_error("Division by zero!");
             return Value(l.asNumber() / r.asNumber());
-        case TokenType::Smaller: return Value(l.asNumber() < r.asNumber());
-        case TokenType::Greater: return Value(l.asNumber() > r.asNumber());
-        case TokenType::Double_Equals: return Value(l == r);
+        case VTokenType::Smaller: return Value(l.asNumber() < r.asNumber());
+        case VTokenType::Greater: return Value(l.asNumber() > r.asNumber());
+        case VTokenType::Double_Equals: return Value(l == r);
         default: return Value(0.0);
     }
 }
@@ -412,18 +412,22 @@ Value ModuleNode::evaluate(SymbolContainer& env, std::string currentGroup) const
 }
 
 Value DismissNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
-    std::string scopedName = currentGroup + "." + originalName;
-    if (env.erase(scopedName)) {
-        return Value(1.0);
+    bool erasedSomething = false;
+    uint32_t nameId = StringPool::instance().intern(originalName);
+
+    if (env.erase("global." + originalName)) erasedSomething = true;
+
+    if (env.count(currentGroup)) {
+        if (env[currentGroup].erase(nameId)) erasedSomething = true;
     }
 
-    if (currentGroup != "global") {
-        if (env.erase("global." + originalName)) {
-            return Value(1.0);
-        }
+    if (currentGroup != "global" && env.count("global")) {
+        if (env["global"].erase(nameId)) erasedSomething = true;
     }
 
-    throw std::runtime_error("Module Error: Could not dismiss non-existent module '" + originalName + "' at line " + std::to_string(lineNumber));
+    if (erasedSomething) return Value();
+
+    throw std::runtime_error("Module Error: Could not dismiss '" + originalName + "' at line " + std::to_string(lineNumber));
 }
 
 std::string resolvePath(std::vector<std::string> scope, std::string currentGroup) {

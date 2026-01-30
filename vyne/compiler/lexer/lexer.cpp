@@ -44,7 +44,7 @@ std::vector<Token> tokenize(const std::string& input) {
             if (i < input.length()) {
                 i++;
             }
-            tokens.push_back(Token(TokenType::String, currentLine, 0, strBuffer));
+            tokens.push_back(Token(VTokenType::String, currentLine, 0, strBuffer));
             continue;
         }
 
@@ -53,7 +53,7 @@ std::vector<Token> tokenize(const std::string& input) {
             while (i < input.length() && (std::isdigit(input[i]) || input[i] == '.')) {
                 buffer += input[i++];
             }
-            tokens.emplace_back(TokenType::Number, currentLine, std::stod(buffer), "");
+            tokens.emplace_back(VTokenType::Number, currentLine, std::stod(buffer), "");
             continue;
         }
 
@@ -64,46 +64,46 @@ std::vector<Token> tokenize(const std::string& input) {
             }
 
             // parsing keywords
-            if (buffer == "log") tokens.emplace_back(TokenType::BuiltIn, currentLine, 0, buffer);
-            else if (buffer == "sizeof") tokens.emplace_back(TokenType::BuiltIn, currentLine, 0, buffer);
-            else if (buffer == "type") tokens.emplace_back(TokenType::BuiltIn, currentLine, 0, buffer);
-            else if (buffer == "group") tokens.emplace_back(TokenType::Group, currentLine, 0, "");
-            else if (buffer == "true") tokens.emplace_back(TokenType::True, currentLine, 1, "");
-            else if (buffer == "false") tokens.emplace_back(TokenType::False, currentLine, 0, "");
-            else if (buffer == "null") tokens.emplace_back(TokenType::Null, currentLine, 0, "");
-            else if (buffer == "sub") tokens.emplace_back(TokenType::Function, currentLine, 0, buffer);
-            else if (buffer == "return") tokens.emplace_back(TokenType::Return, currentLine, 0, buffer);
-            else if (buffer == "while") tokens.emplace_back(TokenType::While, currentLine, 0, buffer);
-            else if (buffer == "break") tokens.emplace_back(TokenType::Break, currentLine, 0, buffer);
-            else if (buffer == "continue") tokens.emplace_back(TokenType::Continue, currentLine, 0, buffer);
-            else if (buffer == "module") tokens.emplace_back(TokenType::Module, currentLine, 0, buffer);
-            else if (buffer == "dismiss") tokens.emplace_back(TokenType::Dismiss, currentLine, 0, buffer);
-            else if (buffer == "if") tokens.emplace_back(TokenType::If, currentLine, 0, buffer);
-            else tokens.emplace_back(TokenType::Identifier, currentLine, 0, buffer);
+            if (buffer == "log") tokens.emplace_back(VTokenType::BuiltIn, currentLine, 0, buffer);
+            else if (buffer == "sizeof") tokens.emplace_back(VTokenType::BuiltIn, currentLine, 0, buffer);
+            else if (buffer == "type") tokens.emplace_back(VTokenType::BuiltIn, currentLine, 0, buffer);
+            else if (buffer == "group") tokens.emplace_back(VTokenType::Group, currentLine, 0, "");
+            else if (buffer == "true") tokens.emplace_back(VTokenType::True, currentLine, 1, "");
+            else if (buffer == "false") tokens.emplace_back(VTokenType::False, currentLine, 0, "");
+            else if (buffer == "null") tokens.emplace_back(VTokenType::Null, currentLine, 0, "");
+            else if (buffer == "sub") tokens.emplace_back(VTokenType::Function, currentLine, 0, buffer);
+            else if (buffer == "return") tokens.emplace_back(VTokenType::Return, currentLine, 0, buffer);
+            else if (buffer == "while") tokens.emplace_back(VTokenType::While, currentLine, 0, buffer);
+            else if (buffer == "break") tokens.emplace_back(VTokenType::Break, currentLine, 0, buffer);
+            else if (buffer == "continue") tokens.emplace_back(VTokenType::Continue, currentLine, 0, buffer);
+            else if (buffer == "module") tokens.emplace_back(VTokenType::Module, currentLine, 0, buffer);
+            else if (buffer == "dismiss") tokens.emplace_back(VTokenType::Dismiss, currentLine, 0, buffer);
+            else if (buffer == "if") tokens.emplace_back(VTokenType::If, currentLine, 0, buffer);
+            else tokens.emplace_back(VTokenType::Identifier, currentLine, 0, buffer);
             continue;
         }
 
         switch (character) {
-            case '+': tokens.emplace_back(TokenType::Add, currentLine, 0, "+"); break;
-            case '*': tokens.emplace_back(TokenType::Multiply, currentLine, 0, "*"); break;
-            case '/': tokens.emplace_back(TokenType::Division, currentLine, 0, "/"); break;
-            case '(': tokens.emplace_back(TokenType::Left_Parenthese, currentLine, 0, "("); break;
-            case ')': tokens.emplace_back(TokenType::Right_Parenthese, currentLine, 0, ")"); break;
-            case '{': tokens.emplace_back(TokenType::Left_CB, currentLine, 0, "{"); break;
-            case '}': tokens.emplace_back(TokenType::Right_CB, currentLine, 0, "}"); break;
-            case '[': tokens.emplace_back(TokenType::Left_Bracket, currentLine, 0, "["); break;
-            case ']': tokens.emplace_back(TokenType::Right_Bracket, currentLine, 0, "]"); break;
-            case ',': tokens.emplace_back(TokenType::Comma, currentLine, 0, ","); break;
-            case ';': tokens.emplace_back(TokenType::Semicolon, currentLine, 0, ":"); break;
-            case '<': tokens.emplace_back(TokenType::Smaller, currentLine, 0, "<"); break;
-            case '>': tokens.emplace_back(TokenType::Greater, currentLine, 0, ">"); break;
-            case '.': tokens.emplace_back(TokenType::Dot, currentLine, 0, "."); break;
+            case '+': tokens.emplace_back(VTokenType::Add, currentLine, 0, "+"); break;
+            case '*': tokens.emplace_back(VTokenType::Multiply, currentLine, 0, "*"); break;
+            case '/': tokens.emplace_back(VTokenType::Division, currentLine, 0, "/"); break;
+            case '(': tokens.emplace_back(VTokenType::Left_Parenthese, currentLine, 0, "("); break;
+            case ')': tokens.emplace_back(VTokenType::Right_Parenthese, currentLine, 0, ")"); break;
+            case '{': tokens.emplace_back(VTokenType::Left_CB, currentLine, 0, "{"); break;
+            case '}': tokens.emplace_back(VTokenType::Right_CB, currentLine, 0, "}"); break;
+            case '[': tokens.emplace_back(VTokenType::Left_Bracket, currentLine, 0, "["); break;
+            case ']': tokens.emplace_back(VTokenType::Right_Bracket, currentLine, 0, "]"); break;
+            case ',': tokens.emplace_back(VTokenType::Comma, currentLine, 0, ","); break;
+            case ';': tokens.emplace_back(VTokenType::Semicolon, currentLine, 0, ":"); break;
+            case '<': tokens.emplace_back(VTokenType::Smaller, currentLine, 0, "<"); break;
+            case '>': tokens.emplace_back(VTokenType::Greater, currentLine, 0, ">"); break;
+            case '.': tokens.emplace_back(VTokenType::Dot, currentLine, 0, "."); break;
             case '=': {
                 if (i + 1 < input.length() && input[i + 1] == '=') {
-                    tokens.emplace_back(TokenType::Double_Equals, currentLine, 0, "==");
+                    tokens.emplace_back(VTokenType::Double_Equals, currentLine, 0, "==");
                     i++;
                 } else {
-                    tokens.emplace_back(TokenType::Equals, currentLine, 0, "=");
+                    tokens.emplace_back(VTokenType::Equals, currentLine, 0, "=");
                 }
                 break;
             }
@@ -116,31 +116,31 @@ std::vector<Token> tokenize(const std::string& input) {
             }
             case ':' : {
                 if(i + 1 < input.length() && input[i + 1] == ':'){
-                    tokens.emplace_back(TokenType::Extends, currentLine, 0, "::");
+                    tokens.emplace_back(VTokenType::Extends, currentLine, 0, "::");
                     i++;
                 }
                 break;
             }
             case '&' : {
                 if(i + 1 < input.length() && input[i + 1] == '&'){
-                    tokens.emplace_back(TokenType::And, currentLine, 0, "::");
+                    tokens.emplace_back(VTokenType::And, currentLine, 0, "::");
                     i++;
                 }
                 break;
             }
             case '|' : {
                 if(i + 1 < input.length() && input[i + 1] == '|'){
-                    tokens.emplace_back(TokenType::Or, currentLine, 0, "::");
+                    tokens.emplace_back(VTokenType::Or, currentLine, 0, "::");
                     i++;
                 }
                 break;
             }
             case '-' : {
                 if(i + 1 < input.length() && input[i + 1] == '>'){
-                    tokens.emplace_back(TokenType::Type, currentLine, 0, "::");
+                    tokens.emplace_back(VTokenType::Type, currentLine, 0, "::");
                     i++;
                 } else {
-                    tokens.emplace_back(TokenType::Substract, currentLine, 0, "-");
+                    tokens.emplace_back(VTokenType::Substract, currentLine, 0, "-");
                     i++;
                 }
                 break;
@@ -152,43 +152,43 @@ std::vector<Token> tokenize(const std::string& input) {
         i++;
     }
 
-    tokens.emplace_back(TokenType::End, currentLine, 0, "");
+    tokens.emplace_back(VTokenType::End, currentLine, 0, "");
     return tokens;
 }
 
-std::string tokenTypeToString(TokenType type) {
+std::string VTokenTypeToString(VTokenType type) {
     switch (type) {
-        case TokenType::Number:           return "Number";
-        case TokenType::Multiply:         return "'*'";
-        case TokenType::Add:              return "'+'";
-        case TokenType::Substract:        return "'-'";
-        case TokenType::Division:         return "'/'";
-        case TokenType::Left_Parenthese:  return "'('";
-        case TokenType::Right_Parenthese: return "')'";
-        case TokenType::Identifier:       return "Identifier";
-        case TokenType::Equals:           return "'='";
-        case TokenType::String:           return "String";
-        case TokenType::True:             return "'true'";
-        case TokenType::False:            return "'false'";
-        case TokenType::Null:             return "'null'";
-        case TokenType::Group:            return "Group";
-        case TokenType::Left_CB:          return "'{'";
-        case TokenType::Right_CB:         return "'}'";
-        case TokenType::Left_Bracket:     return "'['";
-        case TokenType::Right_Bracket:    return "']'";
-        case TokenType::Comma:            return "','";
-        case TokenType::Semicolon:        return "';'";
-        case TokenType::Extends:          return "'::'";
-        case TokenType::Dot:              return "'.'";
-        case TokenType::Greater:          return "'>'";
-        case TokenType::Smaller:          return "'<'";
-        case TokenType::While:            return "'while'";
-        case TokenType::Break:            return "'break'";
-        case TokenType::Continue:         return "'continue'";
-        case TokenType::BuiltIn:          return "'BuiltIn'";
-        case TokenType::Module:           return "'Module'";
-        case TokenType::Dismiss:          return "'Dismiss'";
-        case TokenType::End:              return "'end of file'";
+        case VTokenType::Number:           return "Number";
+        case VTokenType::Multiply:         return "'*'";
+        case VTokenType::Add:              return "'+'";
+        case VTokenType::Substract:        return "'-'";
+        case VTokenType::Division:         return "'/'";
+        case VTokenType::Left_Parenthese:  return "'('";
+        case VTokenType::Right_Parenthese: return "')'";
+        case VTokenType::Identifier:       return "Identifier";
+        case VTokenType::Equals:           return "'='";
+        case VTokenType::String:           return "String";
+        case VTokenType::True:             return "'true'";
+        case VTokenType::False:            return "'false'";
+        case VTokenType::Null:             return "'null'";
+        case VTokenType::Group:            return "Group";
+        case VTokenType::Left_CB:          return "'{'";
+        case VTokenType::Right_CB:         return "'}'";
+        case VTokenType::Left_Bracket:     return "'['";
+        case VTokenType::Right_Bracket:    return "']'";
+        case VTokenType::Comma:            return "','";
+        case VTokenType::Semicolon:        return "';'";
+        case VTokenType::Extends:          return "'::'";
+        case VTokenType::Dot:              return "'.'";
+        case VTokenType::Greater:          return "'>'";
+        case VTokenType::Smaller:          return "'<'";
+        case VTokenType::While:            return "'while'";
+        case VTokenType::Break:            return "'break'";
+        case VTokenType::Continue:         return "'continue'";
+        case VTokenType::BuiltIn:          return "'BuiltIn'";
+        case VTokenType::Module:           return "'Module'";
+        case VTokenType::Dismiss:          return "'Dismiss'";
+        case VTokenType::End:              return "'end of file'";
         default:                          return "Unknown Token";
     }
 }
