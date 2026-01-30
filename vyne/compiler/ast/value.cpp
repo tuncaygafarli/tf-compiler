@@ -54,7 +54,7 @@ size_t Value::getDeepBytes() const {
             return total;
         }
         
-        // TODO HANDLE FUNCTIONS AND MODULES
+        // TODO HANDLE MODULES [ CASE 5 ]
         case 4 : {
             auto func = std::get<std::shared_ptr<FunctionData>>(data);
             if (!func) return 0;
