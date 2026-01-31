@@ -14,6 +14,16 @@ enum OpCode : uint8_t {
     OP_RETURN,
     OP_DEFINE_GLOBAL,
     OP_GET_GLOBAL,
+    OP_JUMP_IF_FALSE,
+    OP_JUMP,
+    OP_EQUAL,
+    OP_POP,
+    OP_PRINT,
+    OP_TYPE,
+    OP_ARRAY,
+    OP_LOOP,
+    OP_GREATER,
+    OP_SMALLER
 };
 
 struct Chunk {
