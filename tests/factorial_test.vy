@@ -11,7 +11,7 @@ sub factorial(n) {
 log("Initial Memory:");
 log(vmem.usage());
 
-# High recursion depth
+# high recursion depth
 result = factorial(50); 
 
 log("Factorial(50) Result:");
