@@ -8,7 +8,6 @@ OUT="vyne"
 
 SRC_FILES="main.cpp \
 vyne/vm/vm.cpp \
-vyne/compiler/compiler.cpp \
 vyne/compiler/codegen/chunk.cpp \
 vyne/compiler/codegen/codegen.cpp \
 vyne/compiler/lexer/lexer.cpp \
