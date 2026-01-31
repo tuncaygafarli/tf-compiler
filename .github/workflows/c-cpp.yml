@@ -39,6 +39,6 @@ jobs:
             if [ -f "$testfile" ]; then
               echo "---------------------------------------"
               echo "Running $testfile..."
-              ./vyne_run "$testfile"
+              ./vyne_run --ast "$testfile"
             fi
           done
