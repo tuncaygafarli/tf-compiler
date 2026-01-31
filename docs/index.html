@@ -3,137 +3,85 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vyne Documentation</title>
-    <style>
-      :root {
-        --bg: #0d1117;
-        --sidebar-bg: #161b22;
-        --text: #c9d1d9;
-        --accent: #58a6ff;
-        --code-bg: #1f242c;
-        --border: #30363d;
-      }
-      body {
-        font-family: -apple-system, sans-serif;
-        background-color: var(--bg);
-        color: var(--text);
-        margin: 0;
-        display: flex;
-      }
-      nav {
-        width: 250px;
-        height: 100vh;
-        background: var(--sidebar-bg);
-        border-right: 1px solid var(--border);
-        position: fixed;
-        padding: 2rem 1rem;
-      }
-      main {
-        margin-left: 280px;
-        padding: 2rem 4rem;
-        max-width: 900px;
-      }
-      h1,
-      h2 {
-        color: var(--accent);
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 0.3rem;
-      }
-      code {
-        background: var(--code-bg);
-        padding: 0.2rem 0.4rem;
-        border-radius: 4px;
-        font-family: "Cascadia Code", monospace;
-      }
-      pre {
-        background: var(--code-bg);
-        padding: 1rem;
-        border-radius: 8px;
-        overflow-x: auto;
-        border: 1px solid var(--border);
-      }
-      .pop-note {
-        border-left: 4px solid #f85149;
-        background: rgba(248, 81, 73, 0.1);
-        padding: 1rem;
-        margin: 1rem 0;
-      }
-    </style>
+    <title>Vyne | Getting Started</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body>
-    <nav>
-      <h2>Vyne Lang</h2>
-      <ul>
-        <li>
-          <a href="#intro" style="color: var(--text); text-decoration: none"
-            >Introduction</a
-          >
-        </li>
-        <li>
-          <a href="#syntax" style="color: var(--text); text-decoration: none"
-            >Syntax Basics</a
-          >
-        </li>
-        <li>
-          <a href="#postfix" style="color: var(--text); text-decoration: none"
-            >Postfix Operators</a
-          >
-        </li>
-        <li>
-          <a href="#groups" style="color: var(--text); text-decoration: none"
-            >Groups & Scopes</a
-          >
-        </li>
+  <body class="dark-theme">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <span class="logo">VYNE</span>
+      </div>
+      <ul class="nav-links">
+        <li class="nav-group">Getting Started</li>
+        <li><a href="#what-is-vyne" class="active">What is Vyne?</a></li>
+        <li><a href="#design-goals">Design Goals</a></li>
+        <li><a href="#hello-world">Hello World</a></li>
+        <li class="nav-group">Language Fundamentals</li>
+        <li><a href="#variables">Variables</a></li>
+        <li><a href="#postfix">Postfix Operators</a></li>
+        <li><a href="#groups">Modules & Groups</a></li>
+        <li class="nav-group">Reference</li>
+        <li><a href="codebase/index.html">Codebase API (Doxygen)</a></li>
       </ul>
     </nav>
 
-    <main>
-      <section id="intro">
-        <h1>Welcome to Vyne</h1>
+    <main class="content">
+      <header class="content-header">
+        <div class="breadcrumb">Getting Started / What is Vyne?</div>
+      </header>
+
+      <article>
+        <h1 id="what-is-vyne">What is Vyne?</h1>
         <p>
-          Vyne is a high-performance, stack-based interpreted language designed
-          for modularity and clear execution flow.
+          Vyne is a systems programming language that aims to be an evolution of
+          stack-based interpretation, adding modern quality-of-life features
+          while maintaining a minimalistic ethos.
         </p>
-        <div class="pop-note">
-          <strong>Core Principle:</strong> The VM always does the pop.
+
+        <div class="warning-box">
+          <strong>⚠️ Warning:</strong> Docs may not reflect current language
+          state. The Vyne VM and compiler are still evolving.
         </div>
-      </section>
 
-      <section id="syntax">
-        <h2>Syntax Basics</h2>
-        <p>Declaring variables and functions is intuitive:</p>
-        <pre><code>var energy = 100;
-function calculate(factor) {
-    return energy * factor;
+        <h2 id="design-goals">Design Goals</h2>
+        <ul>
+          <li>
+            <strong>The VM always does the pop:</strong> Predictable stack
+            management.
+          </li>
+          <li>
+            <strong>Minimalistic:</strong> No feature should be unnecessary or
+            redundant.
+          </li>
+          <li>
+            <strong>Tree-based Scoping:</strong> Using "Groups" to prevent
+            global namespace pollution.
+          </li>
+        </ul>
+
+        <h2 id="hello-world">Hello World</h2>
+        <p>A simple program in Vyne looks like this:</p>
+        <div class="code-block">
+          <pre><code>function main() {
+    log("Hello, Vyne!");
 }</code></pre>
-      </section>
+        </div>
 
-      <section id="postfix">
-        <h2>Postfix Operators</h2>
+        <h2 id="postfix">Postfix Operators</h2>
         <p>
-          Vyne supports postfix increment and decrement. These operations return
-          the <strong>original</strong> value before the modification.
+          Vyne supports <code>++</code> and <code>--</code>. These return the
+          original value before the modification.
         </p>
-        <pre><code>var x = 5;
-log(x++); // Outputs 5
-log(x);   // Outputs 6</code></pre>
-      </section>
-
-      <section id="groups">
-        <h2>Groups</h2>
-        <p>
-          Groups allow you to categorize logic into tree-based structures,
-          preventing global namespace pollution.
-        </p>
-        <pre><code>
-            group Physics {
-                gravity = 9.81;
-                sub getWeight(mass) {
-                    return mass * gravity;
-                }
-            };
-        </code></pre>
-      </section>
+        <div class="code-block">
+          <pre><code>var x = 10;
+log(x++); // Outputs 10
+log(x);   // Outputs 11</code></pre>
+        </div>
+      </article>
     </main>
   </body>
 </html>

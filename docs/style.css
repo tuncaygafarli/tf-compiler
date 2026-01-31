@@ -1,0 +1,86 @@
+:root {
+  --bg-main: #0d1117;
+  --bg-sidebar: #010409;
+  --text-primary: #c9d1d9;
+  --text-secondary: #8b949e;
+  --accent: #58a6ff;
+  --border: #30363d;
+  --code-bg: #161b22;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  display: flex;
+}
+
+.sidebar {
+  width: 280px;
+  height: 100vh;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.sidebar-header .logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 2px;
+}
+
+.nav-links {
+  list-style: none;
+  padding: 0;
+  margin-top: 2rem;
+}
+
+.nav-group {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 1.5rem 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--text-primary);
+  display: block;
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.nav-links a.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.content {
+  margin-left: 280px;
+  width: 100%;
+  max-width: 900px;
+  padding: 2rem 4rem;
+}
+
+.warning-box {
+  background: rgba(187, 128, 9, 0.15);
+  border: 1px solid #bb8009;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 2rem 0;
+  color: #e3b341;
+}
+
+.code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-family: monospace;
+}
