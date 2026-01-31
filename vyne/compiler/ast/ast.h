@@ -10,6 +10,7 @@
 #include <sstream>
 #include <functional>
 #include <cstdint>
+#include <cmath>
 
 #include "../lexer/lexer.h"
 #include "value.h"
@@ -264,16 +265,25 @@ public:
 };
 
 class ForNode : public ASTNode {
+    enum class ForMode { LOOP, COLLECT, FILTER, EVERY };
     std::unique_ptr<ASTNode> iterable;
     std::unique_ptr<ASTNode> body;
     std::string iteratorName;
+    ForMode mode;
 
 public:
-    ForNode(std::unique_ptr<ASTNode> i, std::unique_ptr<ASTNode> b, std::string in)
-        : iterable(std::move(i)), body(std::move(b)), iteratorName(std::move(in)) {}
+    ForNode(std::unique_ptr<ASTNode> i, std::unique_ptr<ASTNode> b, std::string in, ForMode m)
+        : iterable(std::move(i)), body(std::move(b)), iteratorName(std::move(in)), mode(m) {}
 
     Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
     void compile(Emitter& e) const override;
+
+    static ForMode getForMode(const std::string& modeStr){
+        if (modeStr == "collect") return ForNode::ForMode::COLLECT;
+        else if (modeStr == "filter") return ForNode::ForMode::FILTER;
+        else if (modeStr == "every") return ForNode::ForMode::EVERY;
+        else return ForNode::ForMode::LOOP;
+    }
 };
 
 class BlockNode : public ASTNode {

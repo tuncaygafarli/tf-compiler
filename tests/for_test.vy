@@ -1,6 +1,5 @@
-x = [];
-x.place_all(2,25);
+z = through it::1..30 -> filter {
+    it % 2 == 0;
+};
 
-through 0..x.size() -> loop {
-    log("Sup");
-}
+log(z);

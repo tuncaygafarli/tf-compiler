@@ -70,7 +70,6 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
         case VTokenType::Return:     return parseReturnStatement();
         case VTokenType::If:         return parseIfStatement();
         case VTokenType::While:      return parseWhileLoop();
-        case VTokenType::Through:    return parseForLoop();
         case VTokenType::Group:      return parseGroupDefinition();
         case VTokenType::Break:      
         case VTokenType::Continue:   return parseLoopControl(); 
@@ -168,7 +167,7 @@ std::unique_ptr<ASTNode> Parser::parseRelational() {
 
 std::unique_ptr<ASTNode> Parser::parseAdditive() {
     auto left = parseTerm();
-    while (peekToken().type == VTokenType::Add || peekToken().type == VTokenType::Substract) {
+    while (peekToken().type == VTokenType::Add || peekToken().type == VTokenType::Substract || peekToken().type == VTokenType::Floor_Divide || peekToken().type == VTokenType::Modulo) {
         Token opToken = getNextToken();
         auto right = parseTerm();
         left = std::make_unique<BinOpNode>(opToken.type, std::move(left), std::move(right));
@@ -210,6 +209,7 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
         case VTokenType::Left_Bracket:            return parseArrayLiteral();
         case VTokenType::Left_Parenthese:         return parseGroupingExpr();
         case VTokenType::BuiltIn:                 return parseBuiltInCall();
+        case VTokenType::Through:                 return parseForLoop();
         default:
             throw std::runtime_error("Unexpected token in factor: " + current.name);
     }
@@ -481,10 +481,11 @@ std::unique_ptr<ASTNode> Parser::parseForLoop() {
         consume(VTokenType::Arrow);
     }
 
-    consume(VTokenType::Loop);
+    std::string modeStr = consume(VTokenType::LoopMode).name;
+    
     auto body = parseBlock();
 
-    auto node = std::make_unique<ForNode>(std::move(iterable), std::move(body), iteratorName);
+    auto node = std::make_unique<ForNode>(std::move(iterable), std::move(body), iteratorName, ForNode::getForMode(modeStr));
     node->lineNumber = line;
     return node;
 }

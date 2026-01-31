@@ -144,6 +144,20 @@ Value BinOpNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
             case VTokenType::Greater: return Value(l.asNumber() > r.asNumber());
             case VTokenType::Greater_Or_Equal: return Value(l.asNumber() >= r.asNumber());
             case VTokenType::Double_Equals: return Value(l == r);
+            case VTokenType::Floor_Divide: {
+                if (r.asNumber() == 0) {
+                    throw std::runtime_error("Division by zero in floor division (//)");
+                }
+
+                return Value(std::floor(l.asNumber() / r.asNumber()));
+            }
+            case VTokenType::Modulo : {
+                if (r.asNumber() == 0) {
+                    throw std::runtime_error("Runtime Error: Modulo by zero is undefined.");
+                }
+
+                return Value(std::fmod(l.asNumber(), r.asNumber()));
+            }
             default: return Value(0.0);
         }
     }
@@ -479,43 +493,53 @@ Value WhileNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
 
 Value ForNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     Value collection = iterable->evaluate(env, currentGroup);
-    
     if (collection.getType() != Value::ARRAY) {
         throw std::runtime_error("Runtime Error: 'through' requires a sequence or range");
     }
 
-    const auto& elements = collection.asList(); 
-    
-    Value lastVal;
+    const auto& elements = collection.asList();
+    auto& scope = env[currentGroup];
     uint32_t itId = StringPool::instance().intern(iteratorName);
 
     Value savedIt;
-    bool hadIt = false;
-    auto& scope = env[currentGroup];
-    
-    if (scope.find(itId) != scope.end()) {
-        savedIt = scope[itId];
-        hadIt = true;
-    }
+    bool hadIt = (scope.find(itId) != scope.end());
+    if (hadIt) savedIt = scope[itId];
+
+    std::vector<Value> resultList;
+    Value lastVal;
 
     for (const auto& element : elements) {
         scope[itId] = element;
         
         try {
-            lastVal = body->evaluate(env, currentGroup);
-        } catch (const BreakException&) {
-            break; 
-        } catch (const ContinueException&) {
-            continue;
-        }
+            Value currentResult = body->evaluate(env, currentGroup);
+
+            switch(mode) {
+                case ForMode::COLLECT:          
+                    resultList.emplace_back(currentResult);
+                    break;
+                case ForMode::FILTER:
+                    if (currentResult.asNumber() != 0) resultList.emplace_back(element);
+                    break;
+                case ForMode::LOOP: 
+                    lastVal = currentResult;
+                    break;
+                case ForMode::EVERY:
+                default:
+                    lastVal = currentResult;
+                    break;
+            }
+
+        } catch (const BreakException&) { break; }
+          catch (const ContinueException&) { continue; }
     }
 
-    if (hadIt) {
-        scope[itId] = savedIt;
-    } else {
-        scope.erase(itId);
-    }
+    if (hadIt) scope[itId] = savedIt;
+    else scope.erase(itId);
 
+    if (mode == ForMode::COLLECT || mode == ForMode::FILTER) {
+        return Value(resultList);
+    }
     return lastVal;
 }
 

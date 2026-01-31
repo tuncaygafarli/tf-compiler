@@ -23,7 +23,7 @@ enum class VTokenType {
     If,
     While,
     Through,
-    Loop,
+    LoopMode,
     Return,
     Break,
     Continue,
@@ -35,6 +35,8 @@ enum class VTokenType {
     Division,           // /
     Double_Increment,   // ++
     Double_Decrement,   // --
+    Floor_Divide,       //
+    Modulo,             // %
 
     // --- OPERATORS: LOGIC & RELATIONAL ---
     And, Or,            // &&, ||

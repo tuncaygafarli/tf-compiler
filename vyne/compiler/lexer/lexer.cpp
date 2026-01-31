@@ -85,7 +85,10 @@ std::vector<Token> tokenize(const std::string& input) {
             else if (buffer == "return") tokens.emplace_back(VTokenType::Return, currentLine, 0, buffer);
             else if (buffer == "while") tokens.emplace_back(VTokenType::While, currentLine, 0, buffer);
             else if (buffer == "through") tokens.emplace_back(VTokenType::Through, currentLine, 0, buffer);
-            else if (buffer == "loop") tokens.emplace_back(VTokenType::Loop, currentLine, 0, buffer);
+            else if (buffer == "loop") tokens.emplace_back(VTokenType::LoopMode, currentLine, 0, buffer);
+            else if (buffer == "collect") tokens.emplace_back(VTokenType::LoopMode, currentLine, 0, buffer);
+            else if (buffer == "every") tokens.emplace_back(VTokenType::LoopMode, currentLine, 0, buffer);
+            else if (buffer == "filter") tokens.emplace_back(VTokenType::LoopMode, currentLine, 0, buffer);
             else if (buffer == "break") tokens.emplace_back(VTokenType::Break, currentLine, 0, buffer);
             else if (buffer == "continue") tokens.emplace_back(VTokenType::Continue, currentLine, 0, buffer);
             else if (buffer == "module") tokens.emplace_back(VTokenType::Module, currentLine, 0, buffer);
@@ -97,7 +100,6 @@ std::vector<Token> tokenize(const std::string& input) {
 
         switch (character) {
             case '*': tokens.emplace_back(VTokenType::Multiply, currentLine, 0, "*"); break;
-            case '/': tokens.emplace_back(VTokenType::Division, currentLine, 0, "/"); break;
             case '(': tokens.emplace_back(VTokenType::Left_Parenthese, currentLine, 0, "("); break;
             case ')': tokens.emplace_back(VTokenType::Right_Parenthese, currentLine, 0, ")"); break;
             case '{': tokens.emplace_back(VTokenType::Left_CB, currentLine, 0, "{"); break;
@@ -106,6 +108,16 @@ std::vector<Token> tokenize(const std::string& input) {
             case ']': tokens.emplace_back(VTokenType::Right_Bracket, currentLine, 0, "]"); break;
             case ',': tokens.emplace_back(VTokenType::Comma, currentLine, 0, ","); break;
             case ';': tokens.emplace_back(VTokenType::Semicolon, currentLine, 0, ":"); break;
+            case '%': tokens.emplace_back(VTokenType::Modulo, currentLine, 0, "%"); break;
+            case '/': {
+                if (i + 1 < input.length() && input[i + 1] == '/') {
+                    tokens.emplace_back(VTokenType::Floor_Divide, currentLine, 0, "//");
+                    i++;
+                } else {
+                    tokens.emplace_back(VTokenType::Division, currentLine, 0, "/");
+                }
+                break;
+            }
             case '.': {
                 if (i + 1 < input.length() && input[i + 1] == '.') {
                     tokens.emplace_back(VTokenType::Double_Dot, currentLine, 0, "..");
