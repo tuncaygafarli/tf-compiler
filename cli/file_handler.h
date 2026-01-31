@@ -19,4 +19,4 @@
 #define CYAN    "\033[36m"
 #define BOLD    "\033[1m"
 
-int runFile(const std::string& filename, SymbolContainer& env);
+int runFile(const std::string& filename, SymbolContainer& env, const std::string& mode);

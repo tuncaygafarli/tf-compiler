@@ -1,6 +1,9 @@
+sum = 0;
 i = 0;
 
-while i < 8{
-    log(i);
+while i < 1000000 {
+    sum = sum + i;
     i = i + 1;
 }
+
+log(sum);

@@ -8,8 +8,18 @@ int main(int argc, char* argv[]) {
     uint32_t piId = StringPool::instance().intern("pi");
     env["global"][piId] = Value(3.14159);
 
-    if (argc > 1) {
-        runFile(argv[1], env);
+    if (argc == 3) {
+        std::string flag = argv[1];
+        std::string filename = argv[2];
+
+        if (flag == "--ast") {
+            runFile(filename, env, "ast");
+        } else if (flag == "--bytecode") {
+            runFile(filename, env, "bytecode");
+        } else {
+            std::cerr << "Unknown flag: " << flag << "\n";
+            return 1;
+        }
     } else {
         std::string input;
         init_REPL(input, env);

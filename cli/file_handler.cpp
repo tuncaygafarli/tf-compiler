@@ -1,6 +1,6 @@
 #include "file_handler.h"
 
-int runFile(const std::string& filename, SymbolContainer& env){
+int runFile(const std::string& filename, SymbolContainer& env, const std::string& mode){
     size_t dotPos = filename.find_last_of(".");
     if (dotPos == std::string::npos || filename.substr(dotPos + 1) != "vy") {
         std::cerr << RED << "Error: File must end in .vy ( .vyne )" << RESET << "\n";
@@ -23,22 +23,43 @@ int runFile(const std::string& filename, SymbolContainer& env){
         auto programRoot = parser.parseProgram();
         std::shared_ptr<ASTNode> rootShared = std::move(programRoot);
 
-        std::cout << GREEN << "Compiling " << filename << "..." << RESET << "\n";
+        if (mode == "ast") {
+            std::cout << GREEN << "Executing via AST Interpreter...\n" << RESET;
+            auto start = std::chrono::high_resolution_clock::now();
 
-        Chunk chunk = compile(rootShared);
+            rootShared->evaluate(env); 
+            
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double, std::milli> ms = end - start;
+            std::cout << GREEN << "\nExecution finished in: " << ms.count() << "ms" << RESET;
+            return 0;
+        } else {
+            std::cout << GREEN << "Compiling to Bytecode..." << RESET << "\n";
+    
+            Chunk chunk = compile(rootShared);
+            disassembleChunk(chunk, filename);
 
-        disassembleChunk(chunk, filename);
+            VM vm(env); 
 
-        std::cout << GREEN << "\nCompilation successful." << RESET << "\n";
-        VM vm(env); 
-        InterpretResult result = vm.interpret(chunk);
+            std::cout << GREEN << "Running VM...\n" << RESET;
+            
+            auto start = std::chrono::high_resolution_clock::now();
 
-        if (result == INTERPRET_RUNTIME_ERROR) {
-            return 70;
+            InterpretResult result = vm.interpret(chunk);
+
+            auto end = std::chrono::high_resolution_clock::now();
+            
+            std::chrono::duration<double, std::milli> ms = end - start;
+
+            if (result == INTERPRET_OK) {
+                std::cout << GREEN << "\nVM Execution finished in: " << ms.count() << "ms" << RESET << "\n";
+            }
+
+            return (result == INTERPRET_OK) ? 0 : 70;
         }
-
     } catch (const std::exception& e) {
-        std::cerr << RED << "Error during compilation: " << e.what() << RESET << "\n";
+        std::cerr << RED << "Error: " << e.what() << RESET << "\n";
+        return 1;
     }
 
     return 0;
