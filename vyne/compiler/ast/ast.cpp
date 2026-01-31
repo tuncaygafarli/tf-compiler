@@ -151,6 +151,24 @@ Value BinOpNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
     throw std::runtime_error("Type Error: Invalid operation '" + VTokenTypeToString(op) + "' between " + l.getTypeName() + " and " + r.getTypeName());
 }
 
+Value PostFixNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
+    auto varNode = dynamic_cast<VariableNode*>(left.get());
+    if (!varNode) {
+        throw std::runtime_error("Type Error: Cannot increment a non-variable.");
+    }
+
+    Value oldValue = left->evaluate(env, currentGroup);
+
+    double rawNum = oldValue.asNumber();
+    Value newVal;
+
+    if(op == VTokenType::Double_Increment) newVal = Value(rawNum + 1);
+
+    env[currentGroup][varNode->getNameId()] = newVal;
+
+    return newVal;
+}
+
 Value ArrayNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     std::vector<Value> results;
     for (const auto& node : elements) results.emplace_back(node->evaluate(env, currentGroup));

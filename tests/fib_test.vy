@@ -9,7 +9,7 @@ while (i < n) {
     temp = a;
     a = b;
     b = temp + b;
-    i = i + 1;
+    i++;
 }
 
 log("Result:");

@@ -43,6 +43,8 @@ void BinOpNode::compile(Emitter& e) const {
     }
 }
 
+void PostFixNode::compile(Emitter& e) const {}
+
 void ProgramNode::compile(Emitter& e) const {
     for (const auto& stmt : statements) {
         if (stmt) stmt->compile(e);

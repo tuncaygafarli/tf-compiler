@@ -154,8 +154,18 @@ std::unique_ptr<ASTNode> Parser::parseRelational() {
     return left;
 }
 
+std::unique_ptr<ASTNode> Parser::parseAdditive() {
+    auto left = parseTerm();
+    while (peekToken().type == VTokenType::Add || peekToken().type == VTokenType::Substract) {
+        Token opToken = getNextToken();
+        auto right = parseTerm();
+        left = std::make_unique<BinOpNode>(opToken.type, std::move(left), std::move(right));
+    }
+    return left;
+}
+
 std::unique_ptr<ASTNode> Parser::parseTerm() {
-    auto left = parseFactor();
+    auto left = parsePostfix();
     while (peekToken().type == VTokenType::Multiply || peekToken().type == VTokenType::Division) {
         Token opToken = getNextToken();
         auto right = parseFactor();
@@ -166,12 +176,13 @@ std::unique_ptr<ASTNode> Parser::parseTerm() {
     return left;
 }
 
-std::unique_ptr<ASTNode> Parser::parseAdditive() {
-    auto left = parseTerm();
-    while (peekToken().type == VTokenType::Add || peekToken().type == VTokenType::Substract) {
+std::unique_ptr<ASTNode> Parser::parsePostfix() {
+    auto left = parseFactor();
+    while (peekToken().type == VTokenType::Double_Increment) {
         Token opToken = getNextToken();
-        auto right = parseTerm();
-        left = std::make_unique<BinOpNode>(opToken.type, std::move(left), std::move(right));
+        auto node = std::make_unique<PostFixNode>(opToken.type, std::move(left));
+        node->lineNumber = opToken.line;
+        left = std::move(node);
     }
     return left;
 }

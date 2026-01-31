@@ -121,6 +121,18 @@ public:
     Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
     void compile(Emitter& e) const override;
 };
+
+class PostFixNode : public ASTNode {
+    VTokenType op;
+    std::unique_ptr<ASTNode> left;
+public:
+    PostFixNode(VTokenType op, std::unique_ptr<ASTNode> lhs)
+        : op(op), left(std::move(lhs)) {}
+    
+    Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
+    void compile(Emitter& e) const override;
+};
+
 class BuiltInCallNode : public ASTNode {
     std::string funcName;
     std::vector<std::unique_ptr<ASTNode>> arguments;
