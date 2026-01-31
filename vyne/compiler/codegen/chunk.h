@@ -18,7 +18,9 @@ enum OpCode : uint8_t {
     OP_JUMP,
     OP_EQUAL,
     OP_POP,
-    OP_PRINT
+    OP_PRINT,
+    OP_TYPE,
+    OP_ARRAY
 };
 
 struct Chunk {

@@ -1,6 +1,20 @@
 #include "emitter.h"
 #include "../ast/ast.h"
 
+Chunk compile(std::shared_ptr<ASTNode> root) {
+    Chunk chunk;
+    Emitter emitter(&chunk);
+
+    if (root) {
+        root->compile(emitter);
+    }
+
+    
+
+    emitter.emitReturn(); 
+    return chunk;
+}
+
 void NumberNode::compile(Emitter& e) const {
     e.emitConstant(Value(value));
 }
@@ -25,18 +39,6 @@ void BinOpNode::compile(Emitter& e) const {
         case VTokenType::Double_Equals : e.emitByte(OP_EQUAL); break;
         default: break;
     }
-}
-
-Chunk compile(std::shared_ptr<ASTNode> root) {
-    Chunk chunk;
-    Emitter emitter(&chunk);
-
-    if (root) {
-        root->compile(emitter);
-    }
-
-    emitter.emitReturn(); 
-    return chunk;
 }
 
 void ProgramNode::compile(Emitter& e) const {
@@ -73,8 +75,18 @@ void BuiltInCallNode::compile(Emitter& e) const {
     if (funcName == "log") {
         e.emitByte(OP_PRINT);
     }
+    else if (funcName == "type") {
+        e.emitByte(OP_TYPE);
+    }
 }
-void ArrayNode::compile(Emitter& e) const {}
+void ArrayNode::compile(Emitter& e) const {
+    for (const auto& element : elements) {
+        element->compile(e);
+    }
+
+    e.emitByte(OP_ARRAY);
+    e.emitByte(static_cast<uint8_t>(elements.size()));
+}
 void IndexAccessNode::compile(Emitter& e) const {}
 void FunctionNode::compile(Emitter& e) const {}
 void FunctionCallNode::compile(Emitter& e) const {}

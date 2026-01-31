@@ -109,8 +109,34 @@ InterpretResult VM::run() {
                 std::cout << "\n";
                 break;
             }
+            case OP_TYPE : {
+                Value val = pop();
+                push(Value(val.getTypeName()));
+                break;
+            }
+            case OP_ARRAY : {
+                uint8_t count = READ_BYTE();
+                std::vector<Value> arrayElements;
+
+                arrayElements.reserve(count);
+
+                for (int i = 0; i < count; i++) {
+                    arrayElements.push_back(pop());
+                }
+
+                std::reverse(arrayElements.begin(), arrayElements.end());
+
+                push(Value(arrayElements));
+                break;
+            }
             case OP_RETURN: {
-                Value finalResult = pop();
+                Value finalResult;
+                if (!stack.empty()) {
+                    finalResult = pop();
+                } else {
+                    finalResult = Value();
+                }
+                
                 std::cout << "Result: ";
                 finalResult.print(std::cout);
                 std::cout << std::endl;
