@@ -91,6 +91,8 @@ void ArrayNode::compile(Emitter& e) const {
     e.emitByte(OP_ARRAY);
     e.emitByte(static_cast<uint8_t>(elements.size()));
 }
+
+void RangeNode::compile(Emitter& e) const {}
 void IndexAccessNode::compile(Emitter& e) const {}
 void FunctionNode::compile(Emitter& e) const {}
 void FunctionCallNode::compile(Emitter& e) const {}
@@ -108,6 +110,9 @@ void WhileNode::compile(Emitter& e) const {
 
     e.patchJump(exitJump);
 }
+
+void ForNode::compile(Emitter& e) const {};
+
 void BlockNode::compile(Emitter& e) const {
     for (const auto& stmt : statements) {
         if (stmt) stmt->compile(e);

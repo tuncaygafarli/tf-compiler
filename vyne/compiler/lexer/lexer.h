@@ -17,11 +17,13 @@ enum class VTokenType {
     Extends,            // Inheritance/Injections
     Module,             // Namespace declaration
     Dismiss,            // Unload/Remove module
-    Type,               // Type checking
+    Arrow,              // Loop sequencer
 
     // --- KEYWORDS: CONTROL FLOW ---
     If,
     While,
+    Through,
+    Loop,
     Return,
     Break,
     Continue,
@@ -53,6 +55,7 @@ enum class VTokenType {
     Comma,              // ,
     Semicolon,          // ;
     Dot,                // .
+    Double_Dot,         // ..
 
     // --- SPECIAL ---
     BuiltIn,            // Pre-defined functions

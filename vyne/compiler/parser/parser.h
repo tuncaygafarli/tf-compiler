@@ -27,6 +27,7 @@ private:
 	std::unique_ptr<ASTNode> parseReturnStatement();
 	std::unique_ptr<ASTNode> parseIfStatement();
 	std::unique_ptr<ASTNode> parseWhileLoop();
+	std::unique_ptr<ASTNode> parseForLoop();
 	std::unique_ptr<ASTNode> parseAssignment();
 	std::unique_ptr<ASTNode> parseGroupDefinition();
 	std::unique_ptr<ASTNode> parseModuleStatement();
@@ -51,9 +52,10 @@ public:
 	std::unique_ptr<ASTNode>     parsePostfix();
 	std::unique_ptr<ASTNode>     parseAdditive();
 	std::unique_ptr<ASTNode>     parseRelational();
-	std::unique_ptr<ASTNode>     parseLogicalOr();
-	std::unique_ptr<ASTNode>     parseLogicalAnd();
 	std::unique_ptr<ASTNode>     parseEquality();
+	std::unique_ptr<ASTNode>     parseLogicalAnd();
+	std::unique_ptr<ASTNode>     parseLogicalOr();
+	std::unique_ptr<ASTNode>     parseRange();		
 	std::unique_ptr<ASTNode>     parseExpression();
 	std::unique_ptr<ProgramNode> parseProgram();
 };

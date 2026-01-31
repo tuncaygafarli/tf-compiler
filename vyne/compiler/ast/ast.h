@@ -175,6 +175,16 @@ public:
     void compile(Emitter& e) const override;
 };
 
+class RangeNode : public ASTNode {
+    std::unique_ptr<ASTNode> left;
+    std::unique_ptr<ASTNode> right;
+public:
+    RangeNode(std::unique_ptr<ASTNode> l, std::unique_ptr<ASTNode> r) : left(std::move(l)), right(std::move(r)) {}
+
+    Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
+    void compile(Emitter& e) const override;
+};
+
 class IndexAccessNode : public ASTNode {
     uint32_t nameId;
     std::string originalName;
@@ -248,6 +258,19 @@ class WhileNode : public ASTNode {
 public:
     WhileNode(std::unique_ptr<ASTNode> c, std::unique_ptr<ASTNode> b)
         : condition(std::move(c)), body(std::move(b)) {}
+
+    Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
+    void compile(Emitter& e) const override;
+};
+
+class ForNode : public ASTNode {
+    std::unique_ptr<ASTNode> iterable;
+    std::unique_ptr<ASTNode> body;
+    std::string iteratorName;
+
+public:
+    ForNode(std::unique_ptr<ASTNode> i, std::unique_ptr<ASTNode> b, std::string in)
+        : iterable(std::move(i)), body(std::move(b)), iteratorName(std::move(in)) {}
 
     Value evaluate(SymbolContainer& env, std::string currentGroup = "global") const override;
     void compile(Emitter& e) const override;

@@ -70,6 +70,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
         case VTokenType::Return:     return parseReturnStatement();
         case VTokenType::If:         return parseIfStatement();
         case VTokenType::While:      return parseWhileLoop();
+        case VTokenType::Through:    return parseForLoop();
         case VTokenType::Group:      return parseGroupDefinition();
         case VTokenType::Break:      
         case VTokenType::Continue:   return parseLoopControl(); 
@@ -110,7 +111,18 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 }
 
 std::unique_ptr<ASTNode> Parser::parseExpression() {
-    return parseLogicalOr();
+    return parseRange();
+}
+
+std::unique_ptr<ASTNode> Parser::parseRange() {
+    auto left = parseLogicalOr();
+    
+    while (peekToken().type == VTokenType::Double_Dot) {
+        Token opToken = getNextToken();
+        auto right = parseLogicalOr();
+        left = std::make_unique<RangeNode>(std::move(left), std::move(right));
+    }
+    return left;
 }
 
 std::unique_ptr<ASTNode> Parser::parseLogicalOr() {
@@ -335,7 +347,6 @@ std::unique_ptr<ASTNode> Parser::parseBuiltInCall() {
     
     std::vector<std::unique_ptr<ASTNode>> args;
     if (peekToken().type != VTokenType::Right_Parenthese) {
-        // Use a common pattern: Parse first, then while(comma) parse next
         do {
             if (peekToken().type == VTokenType::Comma) consume(VTokenType::Comma);
             args.emplace_back(parseExpression());
@@ -449,6 +460,31 @@ std::unique_ptr<ASTNode> Parser::parseWhileLoop() {
     
     auto body = parseStatement();
     auto node = std::make_unique<WhileNode>(std::move(condition), std::move(body));
+    node->lineNumber = line;
+    return node;
+}
+
+std::unique_ptr<ASTNode> Parser::parseForLoop() {
+    int line = peekToken().line;
+    consume(VTokenType::Through);
+    
+    std::string iteratorName = "it";
+
+    if (peekToken().type == VTokenType::Identifier && lookAhead(1).type == VTokenType::Extends) {
+        iteratorName = consume(VTokenType::Identifier).name;
+        consume(VTokenType::Extends);
+    }
+
+    auto iterable = parseExpression(); 
+
+    if (peekToken().type == VTokenType::Arrow) {
+        consume(VTokenType::Arrow);
+    }
+
+    consume(VTokenType::Loop);
+    auto body = parseBlock();
+
+    auto node = std::make_unique<ForNode>(std::move(iterable), std::move(body), iteratorName);
     node->lineNumber = line;
     return node;
 }

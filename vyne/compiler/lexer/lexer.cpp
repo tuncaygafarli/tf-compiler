@@ -50,13 +50,21 @@ std::vector<Token> tokenize(const std::string& input) {
 
         if (std::isdigit(character)) {
             std::string buffer;
-            while (i < input.length() && (std::isdigit(input[i]) || input[i] == '.')) {
-                buffer += input[i++];
+            while (i < input.length()) {
+                if (std::isdigit(input[i])) {
+                    buffer += input[i++];
+                } else if (input[i] == '.') {
+                    if (i + 1 < input.length() && input[i + 1] == '.') {
+                        break;
+                    }
+                    buffer += input[i++];
+                } else {
+                    break;
+                }
             }
             tokens.emplace_back(VTokenType::Number, currentLine, std::stod(buffer), "");
             continue;
         }
-
         if (std::isalpha(character) || character == '_') {
             std::string buffer;
             while (i < input.length() && (std::isalnum(input[i]) || input[i] == '_')) {
@@ -77,6 +85,8 @@ std::vector<Token> tokenize(const std::string& input) {
             else if (buffer == "sub") tokens.emplace_back(VTokenType::Function, currentLine, 0, buffer);
             else if (buffer == "return") tokens.emplace_back(VTokenType::Return, currentLine, 0, buffer);
             else if (buffer == "while") tokens.emplace_back(VTokenType::While, currentLine, 0, buffer);
+            else if (buffer == "through") tokens.emplace_back(VTokenType::Through, currentLine, 0, buffer);
+            else if (buffer == "loop") tokens.emplace_back(VTokenType::Loop, currentLine, 0, buffer);
             else if (buffer == "break") tokens.emplace_back(VTokenType::Break, currentLine, 0, buffer);
             else if (buffer == "continue") tokens.emplace_back(VTokenType::Continue, currentLine, 0, buffer);
             else if (buffer == "module") tokens.emplace_back(VTokenType::Module, currentLine, 0, buffer);
@@ -97,7 +107,15 @@ std::vector<Token> tokenize(const std::string& input) {
             case ']': tokens.emplace_back(VTokenType::Right_Bracket, currentLine, 0, "]"); break;
             case ',': tokens.emplace_back(VTokenType::Comma, currentLine, 0, ","); break;
             case ';': tokens.emplace_back(VTokenType::Semicolon, currentLine, 0, ":"); break;
-            case '.': tokens.emplace_back(VTokenType::Dot, currentLine, 0, "."); break;
+            case '.': {
+                if (i + 1 < input.length() && input[i + 1] == '.') {
+                    tokens.emplace_back(VTokenType::Double_Dot, currentLine, 0, "..");
+                    i++;
+                } else {
+                    tokens.emplace_back(VTokenType::Dot, currentLine, 0, ".");
+                }
+                break;
+            }
             case '+': {
                 if (i + 1 < input.length() && input[i + 1] == '+') {
                     tokens.emplace_back(VTokenType::Double_Increment, currentLine, 0, "++");
@@ -164,7 +182,7 @@ std::vector<Token> tokenize(const std::string& input) {
             }
             case '-' : {
                 if(i + 1 < input.length() && input[i + 1] == '>'){
-                    tokens.emplace_back(VTokenType::Type, currentLine, 0, "->");
+                    tokens.emplace_back(VTokenType::Arrow, currentLine, 0, "->");
                     i++;
                 } else if(i + 1 < input.length() && input[i + 1] == '-'){
                     tokens.emplace_back(VTokenType::Double_Decrement, currentLine, 0, "--");

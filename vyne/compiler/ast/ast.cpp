@@ -178,6 +178,17 @@ Value ArrayNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
     return Value(results);
 }
 
+Value RangeNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
+    double start = left->evaluate(env, currentGroup).asNumber();
+    double end = right->evaluate(env, currentGroup).asNumber();
+    
+    std::vector<Value> rangeArray;
+    for (double i = start; i <= end; ++i) {
+        rangeArray.emplace_back(Value(i));
+    }
+    return Value(rangeArray);
+}
+
 Value BuiltInCallNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
     std::vector<Value> argValues;
     for (auto& arg : arguments) argValues.push_back(arg->evaluate(env, currentGroup));
@@ -454,6 +465,48 @@ Value WhileNode::evaluate(SymbolContainer& env, std::string currentGroup) const 
           catch (const ContinueException&) { continue; }
     }
     return lastResult;
+}
+
+Value ForNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
+    Value collection = iterable->evaluate(env, currentGroup);
+    
+    if (collection.getType() != Value::ARRAY) {
+        throw std::runtime_error("Runtime Error: 'through' requires a sequence or range");
+    }
+
+    const auto& elements = collection.asList(); 
+    
+    Value lastVal;
+    uint32_t itId = StringPool::instance().intern(iteratorName);
+
+    Value savedIt;
+    bool hadIt = false;
+    auto& scope = env[currentGroup];
+    
+    if (scope.find(itId) != scope.end()) {
+        savedIt = scope[itId];
+        hadIt = true;
+    }
+
+    for (const auto& element : elements) {
+        scope[itId] = element;
+        
+        try {
+            lastVal = body->evaluate(env, currentGroup);
+        } catch (const BreakException&) {
+            break; 
+        } catch (const ContinueException&) {
+            continue;
+        }
+    }
+
+    if (hadIt) {
+        scope[itId] = savedIt;
+    } else {
+        scope.erase(itId);
+    }
+
+    return lastVal;
 }
 
 Value IfNode::evaluate(SymbolContainer& env, std::string currentGroup) const {
